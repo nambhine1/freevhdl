@@ -1,15 +1,15 @@
 
-# 🔄 Round-Robin Arbiter (VHDL)
+#  Round-Robin Arbiter (VHDL)
 
-## 📘 Overview
+##  Overview
 
 This VHDL module implements a **Round-Robin Arbiter** that fairly selects one request among multiple simultaneous requests. It ensures no requester is starved by rotating the priority after each grant.
 
 ---
 
-## 🧩 Entity: `arbiter_rr`
+##  Entity: `arbiter_rr`
 
-### 🔧 Ports
+###  Ports
 
 | Name          | Direction | Type                             | Description                                  |
 |---------------|-----------|----------------------------------|----------------------------------------------|
@@ -23,7 +23,7 @@ This VHDL module implements a **Round-Robin Arbiter** that fairly selects one re
 
 ---
 
-## ⚙️ Functionality
+##  Functionality
 
 - The arbiter scans the `request` vector in **round-robin** order starting from the index after the last grant.
 - It grants access to the **first active request** it finds.
@@ -32,7 +32,7 @@ This VHDL module implements a **Round-Robin Arbiter** that fairly selects one re
 
 ---
 
-## 🔧 Generic Parameter
+##  Generic Parameter
 
 | Name            | Type    | Default | Description                      |
 |-----------------|---------|---------|----------------------------------|
@@ -40,7 +40,7 @@ This VHDL module implements a **Round-Robin Arbiter** that fairly selects one re
 
 ---
 
-## ⏱ Reset Behavior
+##  Reset Behavior
 
 - On `rst = '1'` (synchronous reset):
   - All grants are cleared
@@ -49,7 +49,7 @@ This VHDL module implements a **Round-Robin Arbiter** that fairly selects one re
 
 ---
 
-## ✅ Use Cases
+##  Use Cases
 
 - Arbitration between multiple clients for:
   - Shared buses
@@ -60,7 +60,7 @@ This VHDL module implements a **Round-Robin Arbiter** that fairly selects one re
 
 ---
 
-## 📝 Notes
+##  Notes
 
 - This arbiter requires that the `request` signals be held high until the grant is received.
 - Only one request is granted at a time per cycle.
