@@ -1,13 +1,14 @@
 
-# 🧠 Block RAM (VHDL)
+#  Block RAM (VHDL)
 
 ## 📘 Overview
 
 This VHDL module implements a **synchronous Block RAM** with configurable depth, data width, and operational mode. The address width is automatically determined using a `clog2` function.
 
-## 🧹 Entity: `Block_Ram`
 
-### 🔧 Ports
+##  Entity: `Block_Ram`
+
+###  Ports
 
 | Name   | Direction | Type                                            | Description                        |
 | ------ | --------- | ----------------------------------------------- | ---------------------------------- |
@@ -20,7 +21,7 @@ This VHDL module implements a **synchronous Block RAM** with configurable depth,
 
 ---
 
-### 🔧 Generic Parameters
+###  Generic Parameters
 
 | Name         | Type    | Default | Description                            |
 | ------------ | ------- | ------- | -------------------------------------- |
@@ -30,7 +31,7 @@ This VHDL module implements a **synchronous Block RAM** with configurable depth,
 
 ---
 
-## ⚙️ Functionality
+##  Functionality
 
 - Supports two read/write modes via `RAM_MODE`:
 
@@ -47,7 +48,7 @@ This VHDL module implements a **synchronous Block RAM** with configurable depth,
 
 ---
 
-## ⏱ Reset Behavior
+##  Reset Behavior
 
 | Condition   | Behavior                             |
 | ----------- | ------------------------------------ |
@@ -56,7 +57,7 @@ This VHDL module implements a **synchronous Block RAM** with configurable depth,
 
 ---
 
-## ✅ Features
+##  Features
 
 - 🚀 Generic parameters: `RAM_DEPTH`, `DATA_WIDTH`, `RAM_MODE`
 - 🧾 Automatic address width via `clog2`
@@ -66,8 +67,8 @@ This VHDL module implements a **synchronous Block RAM** with configurable depth,
 
 ---
 
-## 💡 Notes
+##  Notes
 
-- 🛠 Designed for **VHDL-2008** (for `clog2` in generics)
-- 🧪 Suitable for both **simulation and FPGA synthesis** (e.g., Xilinx Vivado)
-- 🔀 Compatible with testbenches using self-checking assertions
+-  Designed for **VHDL-2008** (for `clog2` in generics)
+-  Suitable for both **simulation and FPGA synthesis** (e.g., Xilinx Vivado)
+-  Compatible with testbenches using self-checking assertions
