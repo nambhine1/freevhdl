@@ -1,7 +1,7 @@
 
 #  Block RAM (VHDL)
 
-## 📘 Overview
+##  Overview
 
 This VHDL module implements a **synchronous Block RAM** with configurable depth, data width, and operational mode. The address width is automatically determined using a `clog2` function.
 
@@ -59,11 +59,11 @@ This VHDL module implements a **synchronous Block RAM** with configurable depth,
 
 ##  Features
 
-- 🚀 Generic parameters: `RAM_DEPTH`, `DATA_WIDTH`, `RAM_MODE`
-- 🧾 Automatic address width via `clog2`
-- 🕒 Clocked synchronous memory access
-- 📏 Configurable read-before-write or write-before-read behavior
-- ⚠️ Built-in assertion for mode configuration validation
+-  Generic parameters: `RAM_DEPTH`, `DATA_WIDTH`, `RAM_MODE`
+-  Automatic address width via `clog2`
+-  Clocked synchronous memory access
+-  Configurable read-before-write or write-before-read behavior
+-  Built-in assertion for mode configuration validation
 
 ---
 
