@@ -6,7 +6,9 @@ entity axi_stream_frame_gen is
         TUSER_WIDTH  : integer := 5;
         TDATA_WIDTH  : integer := 32;
         IMAGE_WIDTH  : integer := 2560;
-        IMAGE_HEIGHT : integer := 1440
+        IMAGE_HEIGHT : integer := 1440;
+        SOF_USER_POS : integer := 0;
+        EOF_USER_POS : integer := 4
     );
     Port (
         clk     : in  std_logic;
@@ -36,7 +38,9 @@ architecture Behavioral of axi_stream_frame_gen is
     signal counter_width : integer range 0 to IMAGE_WIDTH - 1 := 0;
     signal counter_height: integer range 0 to IMAGE_HEIGHT - 1 := 0;
 begin
-
+   assert SOF_USER_POS < TUSER_WIDTH and EOF_USER_POS < TUSER_WIDTH
+        report "SOF_USER_POS , and EOF_USER_POS shall be less than TUSER_WIDTH "
+        severity failure;
     -- Output assignments
     m_valid <= valid_reg;
     m_data  <= data_reg;
@@ -45,6 +49,7 @@ begin
 
     -- Ready when data is not valid or was accepted
     s_ready <= not valid_reg or m_ready;
+    
 
     process(clk)
         variable temp_user : std_logic_vector(TUSER_WIDTH-1 downto 0);
@@ -69,7 +74,7 @@ begin
 
                     -- Check SOF
                     if (counter_width = 0 and counter_height = 0) then
-                        temp_user(0) := '1';  -- Start of Frame
+                        temp_user(SOF_USER_POS) := '1';  -- Start of Frame
                     end if;
 
                     -- Check EOF and update counters
@@ -77,7 +82,7 @@ begin
                         counter_width <= 0;
                         if (counter_height = IMAGE_HEIGHT - 1) then
                             counter_height <= 0;
-                            temp_user(TUSER_WIDTH-1) := '1'; -- End of Frame
+                            temp_user(EOF_USER_POS) := '1'; -- End of Frame
                         else
                             counter_height <= counter_height + 1;
                         end if;

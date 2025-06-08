@@ -7,29 +7,32 @@ end entity;
 
 architecture sim of tb_axi_stream_frame_gen is
 
-    -- Constants
+    -- Parameters for simulation
     constant TUSER_WIDTH  : integer := 5;
     constant TDATA_WIDTH  : integer := 32;
-    constant IMAGE_WIDTH  : integer := 4; -- Reduced for simulation
+    constant IMAGE_WIDTH  : integer := 4;
     constant IMAGE_HEIGHT : integer := 3;
+    constant SOF_USER_POS : integer := 0;
+    constant EOF_USER_POS : integer := 4;
 
-    -- DUT signals
+    -- Derived values
+    constant TOTAL_PIXELS : integer := IMAGE_WIDTH * IMAGE_HEIGHT;
+
+    -- Signals
     signal clk     : std_logic := '0';
     signal rst     : std_logic := '0';
-    
     signal s_valid : std_logic := '0';
     signal s_ready : std_logic;
-    signal s_data  : std_logic_vector(TDATA_WIDTH-1 downto 0) := (others => '0');
-    signal s_user  : std_logic_vector(TUSER_WIDTH-1 downto 0) := (others => '0');
+    signal s_data  : std_logic_vector(TDATA_WIDTH - 1 downto 0);
+    signal s_user  : std_logic_vector(TUSER_WIDTH - 1 downto 0);
     signal s_last  : std_logic := '0';
-    
+
     signal m_valid : std_logic;
     signal m_ready : std_logic := '1';
-    signal m_data  : std_logic_vector(TDATA_WIDTH-1 downto 0);
-    signal m_user  : std_logic_vector(TUSER_WIDTH-1 downto 0);
+    signal m_data  : std_logic_vector(TDATA_WIDTH - 1 downto 0);
+    signal m_user  : std_logic_vector(TUSER_WIDTH - 1 downto 0);
     signal m_last  : std_logic;
 
-    -- Clock period
     constant clk_period : time := 10 ns;
 
 begin
@@ -37,10 +40,12 @@ begin
     -- Instantiate DUT
     uut: entity work.axi_stream_frame_gen
         generic map (
-            TUSER_WIDTH => TUSER_WIDTH,
-            TDATA_WIDTH => TDATA_WIDTH,
-            IMAGE_WIDTH => IMAGE_WIDTH,
-            IMAGE_HEIGHT => IMAGE_HEIGHT
+            TUSER_WIDTH   => TUSER_WIDTH,
+            TDATA_WIDTH   => TDATA_WIDTH,
+            IMAGE_WIDTH   => IMAGE_WIDTH,
+            IMAGE_HEIGHT  => IMAGE_HEIGHT,
+            SOF_USER_POS  => SOF_USER_POS,
+            EOF_USER_POS  => EOF_USER_POS
         )
         port map (
             clk     => clk,
@@ -58,38 +63,34 @@ begin
         );
 
     -- Clock generation
-    clk_process : process
+    clk_process: process
     begin
         while true loop
-            clk <= '0';
-            wait for clk_period / 2;
-            clk <= '1';
-            wait for clk_period / 2;
+            clk <= '0'; wait for clk_period / 2;
+            clk <= '1'; wait for clk_period / 2;
         end loop;
     end process;
 
     -- Stimulus process
-    stim_proc : process
-        variable pixel_count : integer := 0;
+    stim_proc: process
     begin
         -- Reset
         rst <= '1';
-        wait for 2*clk_period;
+        wait for 2 * clk_period;
         rst <= '0';
         wait for clk_period;
 
-        -- Send IMAGE_WIDTH * IMAGE_HEIGHT samples
-        for row in 0 to IMAGE_HEIGHT - 1 loop
-            for col in 0 to IMAGE_WIDTH - 1 loop
-                wait until rising_edge(clk);
-                s_valid <= '1';
-                s_data <= std_logic_vector(to_unsigned(pixel_count, TDATA_WIDTH));
-                pixel_count := pixel_count + 1;
-            end loop;
+        -- Send all pixels
+        for i in 0 to TOTAL_PIXELS - 1 loop
+            wait until rising_edge(clk);
+            s_valid <= '1';
+            s_data  <= std_logic_vector(to_unsigned(i +5, TDATA_WIDTH));
+            s_user  <= (others => '0');
         end loop;
 
-        report "Simulation completed successfully." severity note;
+        s_valid <= '0';
         wait;
+
     end process;
 
 end architecture;
