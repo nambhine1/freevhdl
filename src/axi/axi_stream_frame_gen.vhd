@@ -55,7 +55,7 @@ begin
         variable temp_user : std_logic_vector(TUSER_WIDTH-1 downto 0);
     begin
         if rising_edge(clk) then
-            if rst = '1' then
+            if rst = '0' then
                 valid_reg      <= '0';
                 data_reg       <= (others => '0');
                 user_reg       <= (others => '0');
