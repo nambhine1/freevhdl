@@ -25,6 +25,6 @@ if {$::osvvm::ToolName eq "QuestaSim"} {
 }
 
 
-build ../src/axi/axi_stream_frame_gen.pro
+build ../src/axi/src.pro
 
 build ../tb/osvvm/Frame_gen/TestHarness_frame_gen.pro
