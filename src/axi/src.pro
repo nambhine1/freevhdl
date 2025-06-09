@@ -1,1 +1,2 @@
 analyze axi_stream_frame_gen.vhd
+analyze axi_stream_fifo.vhd
