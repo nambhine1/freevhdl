@@ -1,29 +1,3 @@
-----------------------------------------------------------------------------------
--- Description:
---   This module implements a synchronous block RAM with configurable depth and 
---   data width. The address width is computed using a clog2 function.
---
---   The RAM supports two operational modes defined by the generic RAM_MODE:
---     - "RBW" (Read Before Write): 
---         The output reflects the old data at the address when write and read 
---         occur in the same clock cycle.
---     - "WBR" (Write Before Read): 
---         The new data is written first, and then immediately read back in the 
---         same cycle.
---
---   Features:
---     • Generic parameters: RAM_DEPTH, DATA_WIDTH, RAM_MODE
---     • CLOG2-based address width calculation
---     • Synchronous read/write with clock
---     • Asynchronous reset of output register
---     • Assertion checks for valid RAM_MODE configuration
---
--- Notes:
---   • Compatible with VHDL-2008 (for use of clog2 in port/generic expressions)
---   • Suitable for synthesis with tools like Xilinx Vivado
---   • Intended for behavioral simulation and FPGA implementation
-----------------------------------------------------------------------------------
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
