@@ -1,11 +1,12 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
 
 entity arbiter_fixed_priority is
   generic (
     REQUEST_WIDTH : integer := 3
   );
-  Port (
+  port (
     clk         : in  std_logic;
     rst         : in  std_logic; 
     request     : in  std_logic_vector(REQUEST_WIDTH - 1 downto 0);
@@ -16,43 +17,43 @@ end arbiter_fixed_priority;
 
 architecture Behavioral of arbiter_fixed_priority is
 
-    signal grant_reg         : std_logic_vector(grant'range) := (others => '0');
-    signal valid_grant_reg   : std_logic := '0';
-    signal priority_given    : std_logic := '0';  -- Now a signal
+  -- Internal signals
+  signal grant_reg       : std_logic_vector(REQUEST_WIDTH - 1 downto 0) := (others => '0');
+  signal valid_grant_reg : std_logic := '0';
 
 begin
 
-    -- Validate REQUEST_WIDTH at elaboration time
-    assert (REQUEST_WIDTH > 0)
-      report "REQUEST_WIDTH must be greater than 0."
-      severity failure;
+  -- Output assignments
+  grant       <= grant_reg;
+  valid_grant <= valid_grant_reg;
 
-    -- Output assignments
-    grant       <= grant_reg;
-    valid_grant <= valid_grant_reg;
+  -- Assert REQUEST_WIDTH at elaboration time
+  assert (REQUEST_WIDTH > 0)
+    report "REQUEST_WIDTH must be greater than 0."
+    severity failure;
 
-    -- Fixed-priority arbitration logic
-    fixed_priority : process(clk)
-    begin
-        if rising_edge(clk) then
-            if rst = '1' then
-                grant_reg        <= (others => '0');
-                valid_grant_reg  <= '0';
-                priority_given   <= '0';
-            else
-                grant_reg        <= (others => '0');
-                valid_grant_reg  <= '0';
-                priority_given   <= '0';
+  -- Arbitration logic: fixed priority
+  process(clk)
+    variable priority_given : boolean := false;
+  begin
+    if rising_edge(clk) then
+      if rst = '1' then
+        grant_reg       <= (others => '0');
+        valid_grant_reg <= '0';
+      else
+        grant_reg       <= (others => '0');
+        valid_grant_reg <= '0';
+        priority_given  := false;
 
-                for index in 0 to request'high loop
-                    if request(index) = '1' and priority_given = '0' then
-                        grant_reg(index)    <= '1';
-                        valid_grant_reg     <= '1';
-                        priority_given      <= '1';
-                    end if;
-                end loop;
-            end if;
-        end if;
-    end process;
+        for i in 0 to REQUEST_WIDTH - 1 loop
+          if request(i) = '1' and not priority_given then
+            grant_reg(i)       <= '1';
+            valid_grant_reg    <= '1';
+            priority_given     := true;
+          end if;
+        end loop;
+      end if;
+    end if;
+  end process;
 
 end Behavioral;
