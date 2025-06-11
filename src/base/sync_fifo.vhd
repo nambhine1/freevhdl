@@ -42,10 +42,17 @@ architecture Behavioral of sync_fifo is
     signal fifo_count : unsigned(ADDR_WIDTH downto 0)      := (others => '0');
     signal dout_reg   : std_logic_vector(DATA_WIDTH-1 downto 0);
     signal valid_out_reg : std_logic := '0';
+	signal do_write : std_logic := '0';
+	signal do_read : std_logic := '0';
+	signal handle_counter_fifo : std_logic_vector (1 downto 0) := "00";
 begin
     -- Status flags
     fifo_full  <= '1' when fifo_count = to_unsigned(FIFO_DEPTH, fifo_count'length) else '0';
     fifo_empty <= '1' when fifo_count = 0                                 else '0';
+	do_write <= '1' when we = '1' and fifo_full = '0' else '0';
+	do_read <= '1' when rd_en = '1' and fifo_empty = '0' else '0';
+	handle_counter_fifo <= do_write & do_read;
+	
     fifo_almost_full  <= '1' when fifo_count > to_unsigned(FIFO_ALMOST_FULL_VAL, fifo_count'length) else '0';
     fifo_almost_empty <= '1' when fifo_count < to_unsigned(FIFO_ALMOST_EMPTY_VAL, fifo_count'length) else '0';
 
@@ -66,25 +73,34 @@ begin
             else
                 -- Write
                 valid_out_reg <= '0';
-                if (we = '1' and fifo_full = '0') then
+                if (do_write = '1') then
                     fifo_mem(to_integer(wr_indx)) <= data_in;
                     wr_indx <= to_unsigned(
                                  (to_integer(wr_indx) + 1) mod FIFO_DEPTH,
                                  wr_indx'length
                                );
-                    fifo_count <= fifo_count + 1;
                 end if;
 
                 -- Read
-                if (rd_en = '1' and fifo_empty = '0') then
+                if (do_read = '1') then
                     dout_reg <= fifo_mem(to_integer(rd_indx));
                     valid_out_reg <= '1';
                     rd_indx <= to_unsigned(
                                  (to_integer(rd_indx) + 1) mod FIFO_DEPTH,
                                  rd_indx'length
                                );
-                    fifo_count <= fifo_count - 1;
                 end if;
+				
+				-- handle the counter fifo used for fifo status
+				case (handle_counter_fifo) is 
+					when "10" =>
+						fifo_count <= fifo_count +1;
+					when "01" =>
+						fifo_count <= fifo_count -1;
+					when others => 
+						null; -- keep counter value
+				end case;
+				
             end if;
         end if;
     end process fifo_process;
