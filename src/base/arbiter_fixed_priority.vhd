@@ -18,6 +18,10 @@ architecture Behavioral of arbiter_fixed_priority is
     signal grant_reg : std_logic_vector (grant'range) := (others => '0');
     signal valid_grant_reg : std_logic := '0';
 begin
+    assert (REQUEST_WIDTH > 0)
+        report " request width must bigger than zero."
+        severity failure;
+         
     grant <= grant_reg;
     valid_grant <= valid_grant_reg;
     
