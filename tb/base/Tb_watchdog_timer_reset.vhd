@@ -7,30 +7,17 @@ end tb_watchdog_timer_reset;
 
 architecture Behavioral of tb_watchdog_timer_reset is
 
-    -- Component Declaration
-    component watchdog_timer_reset
-        generic (
-            Granularity_counter : integer := 10; -- Reduced for simulation
-            Time_to_reset_counter : integer := 5 -- Reduced for quick test
-        );
-        Port (
-            clk : in std_logic;
-            reset_system : out std_logic;
-            reset_system_inv : out std_logic
-        );
-    end component;
-
-    -- Signals to connect to DUT
+    -- DUT Signals
     signal clk_tb : std_logic := '0';
     signal reset_system_tb : std_logic;
     signal reset_system_inv_tb : std_logic;
 
-    constant CLK_PERIOD : time := 10 ns; -- 100 MHz simulated clock
+    constant CLK_PERIOD : time := 10 ns; -- Simulated 100 MHz clock
 
 begin
 
-    -- Instantiate the DUT (Design Under Test)
-    uut: watchdog_timer_reset
+    -- Direct Entity Instantiation (VHDL-2008 style)
+    uut: entity work.watchdog_timer_reset
         generic map (
             Granularity_counter => 10,
             Time_to_reset_counter => 5
@@ -41,7 +28,7 @@ begin
             reset_system_inv => reset_system_inv_tb
         );
 
-    -- Clock generation process
+    -- Clock Generation
     clk_process : process
     begin
         while now < 12000 ns loop
@@ -49,6 +36,20 @@ begin
             wait for CLK_PERIOD / 2;
             clk_tb <= '1';
             wait for CLK_PERIOD / 2;
+        end loop;
+        wait;
+    end process;
+
+    -- Optional Monitor Process
+    monitor_proc : process
+    begin
+        wait for 0 ns;
+        report "Simulation started";
+        wait for 10 ns;
+        while now < 12000 ns loop
+            wait until rising_edge(clk_tb);
+            report "reset_system: " & std_logic'image(reset_system_tb) &
+                   ", reset_system_inv: " & std_logic'image(reset_system_inv_tb);
         end loop;
         wait;
     end process;
