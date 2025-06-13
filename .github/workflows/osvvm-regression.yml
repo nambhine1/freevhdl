@@ -30,13 +30,15 @@ jobs:
         ghdl --version
 
     - name: Run OSVVM regression_fifo.tcl
-      run: tclsh script/regression_fifo.tcl
+      run: |
+        cd script
+        tclsh regression_fifo.tcl
 
-    - name: Upload simulation results (optional)
+    - name: Upload simulation results
       uses: actions/upload-artifact@v4
       with:
         name: simulation-results
         path: |
           **/*.ghw
           **/*.vcd
-          ./temp
+          ../temp
