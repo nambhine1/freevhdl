@@ -1,8 +1,13 @@
-source src/library/OsvvmLibraries/Scripts/StartUp.tcl
+# Get directory of the currently running script
+set script_dir [file dirname [info script]]
+
+# Source the Startup.tcl relative to script_dir
+source [file join $script_dir ../src/library/OsvvmLibraries/Scripts/StartUp.tcl]
+
 variable OMIT_XILINX_FILES 0
 
-build ../src/library/OsvvmLibraries/OsvvmLibraries.pro
-      
+build [file join $script_dir ../src/library/OsvvmLibraries/OsvvmLibraries.pro]
+
 if {$::osvvm::ToolName eq "GHDL"} {
     set OMIT_XILINX_FILES 1
     SetExtendedAnalyzeOptions {-frelaxed -Wno-specs}
@@ -16,7 +21,6 @@ if {$::osvvm::ToolName eq "RivieraPRO"} {
     LinkLibraryDirectory {temp/VHDL_LIBS}
 }
 
-# Add precompiled Vivado IP paths if needed
 if {$::osvvm::ToolName eq "QuestaSim"} {
     set OMIT_XILINX_FILES 0
     SetVHDLVersion 2008
@@ -24,6 +28,7 @@ if {$::osvvm::ToolName eq "QuestaSim"} {
     vmap xpm "$PrecompiledVivadoIPCores/xpm"
 }
 
-build ../src/library/math_utils.pro
-build ../src/axi/src.pro
-build ../tb/osvvm/Axi_stream_fifo/TestHarness_fifo.pro
+build [file join $script_dir ../src/library/math_utils.pro]
+build [file join $script_dir ../src/axi/src.pro]
+
+build [file join $script_dir ../tb/osvvm/Axi_stream_fifo/TestHarness_fifo.pro]
