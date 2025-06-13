@@ -1,4 +1,4 @@
-source ../src/library/OsvvmLibraries/Scripts/StartUp.tcl
+source ./src/library/OsvvmLibraries/Scripts/StartUp.tcl
 variable OMIT_XILINX_FILES 0
 
 build ../src/library/OsvvmLibraries/OsvvmLibraries.pro
