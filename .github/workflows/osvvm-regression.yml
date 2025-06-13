@@ -11,32 +11,38 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Install dependencies (GHDL with LLVM backend, Tcl)
-      run: |
-        sudo apt update
-        sudo apt install -y git build-essential llvm-14 llvm-14-dev llvm-14-tools zlib1g-dev gnat tcl
+      - name: Install dependencies (GHDL with LLVM backend, Tcl)
+        run: |
+          sudo apt update
+          sudo apt install -y git build-essential llvm-14 llvm-14-dev llvm-14-tools zlib1g-dev gnat tcl
 
-    - name: Build and install GHDL with LLVM backend
-      run: |
-        git clone https://github.com/ghdl/ghdl.git
-        cd ghdl
-        ./configure --with-llvm-config=llvm-config-14
-        make -j$(nproc)
-        sudo make install
-        cd ..
-        ghdl --version
+      - name: Build and install GHDL with LLVM backend
+        run: |
+          git clone https://github.com/ghdl/ghdl.git
+          cd ghdl
+          ./configure --with-llvm-config=llvm-config-14
+          make -j$(nproc)
+          sudo make install
+          cd ..
+          ghdl --version
 
-    - name: Run OSVVM regression_fifo.tcl
-      run: tclsh script/regression_fifo.tcl
+      - name: Show files for debugging
+        run: |
+          pwd
+          ls -l src/library/OsvvmLibraries/Scripts
+          ls -l src/library/OsvvmLibraries
 
-    - name: Upload simulation results (optional)
-      uses: actions/upload-artifact@v4
-      with:
-        name: simulation-results
-        path: |
-          **/*.ghw
-          **/*.vcd
-          ./temp
+      - name: Run OSVVM regression_fifo.tcl
+        run: tclsh script/regression_fifo.tcl
+
+      - name: Upload simulation results (optional)
+        uses: actions/upload-artifact@v4
+        with:
+          name: simulation-results
+          path: |
+            **/*.ghw
+            **/*.vcd
+            ./temp
