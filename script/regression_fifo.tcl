@@ -1,23 +1,8 @@
-# Get directory of this Tcl script
-set script_dir [file dirname [info script]]
-
-# Get repo root directory (one level above script folder)
-set repo_root [file normalize [file join $script_dir ..]]
-
-# Construct absolute path to StartUp.tcl
-set startup_path [file join $repo_root src/library/OsvvmLibraries/Scripts/StartUp.tcl]
-
-puts "Script directory is: $script_dir"
-puts "Repo root directory is: $repo_root"
-puts "Trying to source $startup_path"
-
-# Source the startup script
-source $startup_path
-
+source src/library/OsvvmLibraries/Scripts/StartUp.tcl
 variable OMIT_XILINX_FILES 0
 
-build [file join $repo_root src/library/OsvvmLibraries/OsvvmLibraries.pro]
-
+build src/library/OsvvmLibraries/OsvvmLibraries.pro
+      
 if {$::osvvm::ToolName eq "GHDL"} {
     set OMIT_XILINX_FILES 1
     SetExtendedAnalyzeOptions {-frelaxed -Wno-specs}
@@ -31,6 +16,7 @@ if {$::osvvm::ToolName eq "RivieraPRO"} {
     LinkLibraryDirectory {temp/VHDL_LIBS}
 }
 
+# add the pre compiled library path below replacing $PrecompiledVivadoIPCores 
 if {$::osvvm::ToolName eq "QuestaSim"} {
     set OMIT_XILINX_FILES 0
     SetVHDLVersion 2008
@@ -38,7 +24,8 @@ if {$::osvvm::ToolName eq "QuestaSim"} {
     vmap xpm "$PrecompiledVivadoIPCores/xpm"
 }
 
-build [file join $repo_root src/library/math_utils.pro]
-build [file join $repo_root src/axi/src.pro]
 
-build [file join $repo_root tb/osvvm/Axi_stream_fifo/TestHarness_fifo.pro]
+
+build  src/library/math_utils.pro
+build src/axi/src.pro
+build tb/osvvm/Axi_stream_fifo/TestHarness_fifo.pro
