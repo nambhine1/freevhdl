@@ -2,7 +2,7 @@ source ../src/library/OsvvmLibraries/Scripts/StartUp.tcl
 variable OMIT_XILINX_FILES 0
 
 build ../src/library/OsvvmLibraries/OsvvmLibraries.pro
-      
+
 if {$::osvvm::ToolName eq "GHDL"} {
     set OMIT_XILINX_FILES 1
     SetExtendedAnalyzeOptions {-frelaxed -Wno-specs}
@@ -16,7 +16,6 @@ if {$::osvvm::ToolName eq "RivieraPRO"} {
     LinkLibraryDirectory {temp/VHDL_LIBS}
 }
 
-# add the pre compiled library path below replacing $PrecompiledVivadoIPCores 
 if {$::osvvm::ToolName eq "QuestaSim"} {
     set OMIT_XILINX_FILES 0
     SetVHDLVersion 2008
@@ -27,4 +26,5 @@ if {$::osvvm::ToolName eq "QuestaSim"} {
 build ../src/library/math_utils.pro
 build ../src/axi/src.pro
 
-build tb/osvvm/Axi_stream_fifo/TestHarness_fifo.pro
+# ✅ Fixed path for testbench
+build ../tb/osvvm/Axi_stream_fifo/TestHarness_fifo.pro
