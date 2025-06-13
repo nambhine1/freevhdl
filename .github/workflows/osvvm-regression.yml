@@ -16,10 +16,12 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install dependencies (GHDL with LLVM backend, Tcl)
+      - name: Install dependencies (GHDL with LLVM backend, Tcl, Tcllib)
         run: |
           sudo apt update
-          sudo apt install -y git build-essential llvm-14 llvm-14-dev llvm-14-tools zlib1g-dev gnat tcl
+          sudo apt install -y git build-essential \
+            llvm-14 llvm-14-dev llvm-14-tools \
+            zlib1g-dev gnat tcl tcllib
 
       - name: Build and install GHDL with LLVM backend
         run: |
