@@ -1,8 +1,17 @@
-# Get directory of the currently running script
+# Get the directory where this script resides
 set script_dir [file dirname [info script]]
 
-# Source the Startup.tcl relative to script_dir
-source [file join $script_dir ../src/library/OsvvmLibraries/Scripts/StartUp.tcl]
+# Print the script directory for debug
+puts "Script dir: $script_dir"
+
+# Construct and normalize the full path to StartUp.tcl
+set startup_path [file normalize [file join $script_dir ../src/library/OsvvmLibraries/Scripts/StartUp.tcl]]
+
+# Print the resolved full path to StartUp.tcl
+puts "Trying to source: $startup_path"
+
+# Source the StartUp.tcl script
+source $startup_path
 
 variable OMIT_XILINX_FILES 0
 
@@ -30,5 +39,4 @@ if {$::osvvm::ToolName eq "QuestaSim"} {
 
 build [file join $script_dir ../src/library/math_utils.pro]
 build [file join $script_dir ../src/axi/src.pro]
-
 build [file join $script_dir ../tb/osvvm/Axi_stream_fifo/TestHarness_fifo.pro]
