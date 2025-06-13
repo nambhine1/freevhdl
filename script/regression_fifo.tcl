@@ -1,17 +1,21 @@
-# Get directory of this Tcl script
+# get the absolute path of the script directory
 set script_dir [file dirname [info script]]
 
-# Debug print
-puts "Script directory is: $script_dir"
+# compute repo root dir (parent of script dir)
+set repo_root [file normalize [file join $script_dir ..]]
 
-# Build absolute path to StartUp.tcl relative to script directory
-set startup_path [file normalize [file join $script_dir ../src/library/OsvvmLibraries/Scripts/StartUp.tcl]]
+puts "Script directory is: $script_dir"
+puts "Repo root directory is: $repo_root"
+
+# source startup using path relative to repo root
+set startup_path [file normalize [file join $repo_root src/library/OsvvmLibraries/Scripts/StartUp.tcl]]
 
 puts "Trying to source $startup_path"
 source $startup_path
 
-# Your remaining build commands with file join for safety
-build [file join $script_dir ../src/library/OsvvmLibraries/OsvvmLibraries.pro]
-build [file join $script_dir ../src/library/math_utils.pro]
-build [file join $script_dir ../src/axi/src.pro]
-build [file join $script_dir ../tb/osvvm/Axi_stream_fifo/TestHarness_fifo.pro]
+# Build commands using repo_root
+build [file join $repo_root src/library/OsvvmLibraries/OsvvmLibraries.pro]
+build [file join $repo_root src/library/math_utils.pro]
+build [file join $repo_root src/axi/src.pro]
+build [file join $repo_root tb/osvvm/Axi_stream_fifo/TestHarness_fifo.pro]
+
