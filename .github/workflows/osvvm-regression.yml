@@ -14,9 +14,6 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: List OsvvmLibraries Scripts directory for debug
-      run: ls -l src/library/OsvvmLibraries/Scripts/
-
     - name: Install dependencies (GHDL with LLVM backend, Tcl)
       run: |
         sudo apt update
