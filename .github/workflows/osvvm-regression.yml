@@ -11,8 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repository with submodules
         uses: actions/checkout@v3
+        with:
+          submodules: recursive
 
       - name: Install dependencies (GHDL with LLVM backend, Tcl)
         run: |
@@ -29,11 +31,15 @@ jobs:
           cd ..
           ghdl --version
 
-      - name: Show files for debugging
+      - name: Debug - Show all files
+        run: find . -type f | sort
+
+      - name: Show OSVVM script directories
         run: |
-          pwd
-          ls -l src/library/OsvvmLibraries/Scripts
-          ls -l src/library/OsvvmLibraries
+          ls -l src/
+          ls -l src/library/
+          ls -l src/library/OsvvmLibraries/
+          ls -l src/library/OsvvmLibraries/Scripts || echo "Scripts directory not found"
 
       - name: Run OSVVM regression_fifo.tcl
         run: tclsh script/regression_fifo.tcl
