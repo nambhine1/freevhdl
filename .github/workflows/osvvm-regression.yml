@@ -14,6 +14,9 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
+    - name: List OsvvmLibraries Scripts directory for debug
+      run: ls -l src/library/OsvvmLibraries/Scripts/
+
     - name: Install dependencies (GHDL with LLVM backend, Tcl)
       run: |
         sudo apt update
@@ -32,7 +35,7 @@ jobs:
     - name: Run OSVVM regression_fifo.tcl
       run: tclsh script/regression_fifo.tcl
 
-    - name: Upload simulation results
+    - name: Upload simulation results (optional)
       uses: actions/upload-artifact@v4
       with:
         name: simulation-results
