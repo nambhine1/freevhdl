@@ -45,6 +45,10 @@ jobs:
 
       - name: Run OSVVM regression_fifo.tcl
         run: tclsh script/regression_fifo.tcl
+        
+        
+       - name: Run OSVVM regression_stream_delta.tcl
+         run: tclsh script/regression_stream_delta.tcl
 
       - name: Run OSVVM frame_gen__fifo.tcl
         run: tclsh script/regression_frame_gen.tcl
