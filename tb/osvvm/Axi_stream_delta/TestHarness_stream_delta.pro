@@ -1,11 +1,11 @@
-TestSuite TestHarness_frame 
+TestSuite TestHarness_axi_stream_delta 
 
 SetLogSignals true
 
 
 
 analyze TestCtrl_e.vhd
-analyze TestHarness_fifo.vhd
+analyze TestHarness_stream_delta.vhd
 
 
 #Testcases:
