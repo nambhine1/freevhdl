@@ -45,6 +45,7 @@ architecture AxiSendGet2 of TestCtrl is
   use      osvvm.ScoreboardPkg_slv.all;
   signal   TestDone : integer_barrier := 1 ;
   signal   SB : ScoreboardIDType;
+  constant Operations_selct : std_logic_vector (1 downto 0) := "01";
 
    
 begin
@@ -92,25 +93,63 @@ begin
   -- AxiTransmitterProc
   --   Generate transactions for AxiTransmitter
   ------------------------------------------------------------
-	AxiTransmitterProc : process
-		variable TxData : std_logic_vector(DATA_WIDTH-1 downto 0);
-		begin
-		wait until nReset = '1';
-		WaitForClock(StreamTxRec, 2);
-		
-		log("Send 1000 words with incrementing values");
-		
-		TxData := (others => '0');  -- Start from 0
-		for J in 0 to 500 loop
-			Push (SB,TxData);
-			Send(StreamTxRec, TxData);
-			TxData := std_logic_vector(unsigned(TxData) + 6);
-		end loop;
-		
-		WaitForClock(StreamTxRec, 2);
-		WaitForBarrier(TestDone);
-		wait;
-	end process AxiTransmitterProc;
+AxiTransmitterProc : process
+    variable TxData       : std_logic_vector(DATA_WIDTH - 1 downto 0);
+    variable Prev_TxData  : std_logic_vector(DATA_WIDTH - 1 downto 0);
+    variable TxFIFO       : std_logic_vector(DATA_WIDTH - 1 downto 0);
+begin
+    wait until nReset = '1';
+    WaitForClock(StreamTxRec, 2);
+
+    log("Send 1000 words with incrementing values");
+
+    TxData := (others => '0');  -- Start from 0
+
+    case Operations_select is
+        when "01" =>
+            for J in 0 to 500 loop
+                if J = 0 then
+                    Push(SB, TxData);
+                    Send(StreamTxRec, TxData);
+                    Prev_TxData := TxData;
+                else
+                    TxFIFO := TxData - Prev_TxData;
+                    Push(SB, TxFIFO);
+                    Send(StreamTxRec, TxData);
+                    Prev_TxData := TxData;
+                end if;
+				TxData := std_logic_vector(unsigned(TxData) + 6);
+            end loop;
+
+        when "10" =>
+            for J in 0 to 500 loop
+                if J = 0 then
+                    Push(SB, TxData);
+                    Send(StreamTxRec, TxData);
+                    Prev_TxData := TxData;
+                else
+                    TxFIFO := TxData + Prev_TxData;
+                    Push(SB, TxFIFO);
+                    Send(StreamTxRec, TxData);
+                    Prev_TxData := TxData;
+                end if;
+				TxData := std_logic_vector(unsigned(TxData) + 6);
+            end loop;
+
+        when others =>
+            for J in 0 to 500 loop
+                Push(SB, TxData);
+                Send(StreamTxRec, TxData);
+                Prev_TxData := TxData;
+                TxData := std_logic_vector(unsigned(TxData) + 6);
+            end loop;
+    end case;
+
+    WaitForClock(StreamTxRec, 2);
+    WaitForBarrier(TestDone);
+    wait;
+end process AxiTransmitterProc;
+
 
 
 

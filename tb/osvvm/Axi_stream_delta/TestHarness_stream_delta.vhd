@@ -115,7 +115,7 @@ begin
 
   DUT : entity work.axi_stream_delta 
 	generic map (
-			DIFF => "00",
+			DIFF => "01,
 			DATA_WIDTH => 32
 	)
     port map (
