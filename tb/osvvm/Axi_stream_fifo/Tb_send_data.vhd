@@ -72,14 +72,6 @@ begin
     AlertIf(now >= 10 ms, "Test finished due to timeout");
     AlertIf(GetAffirmCount < 1, "Test is not Self-Checking");
 
-/*  AffirmIf(Req_FR17, GetAlertCount = 0, GetTestName & "REQUIREMENT FR17 FAILED!!!!!") ;
-    AffirmIf(Req_FR18, GetAlertCount = 0, GetTestName & "REQUIREMENT FR18 FAILED!!!!!") ;
-    AffirmIf(Req_FR19, GetAlertCount = 0, GetTestName & "REQUIREMENT FR19 FAILED!!!!!") ;
-    AffirmIf(Req_FR20, GetAlertCount = 0, GetTestName & "REQUIREMENT FR20 FAILED!!!!!") ;
-    AffirmIf(Req_FR21, GetAlertCount = 0, GetTestName & "REQUIREMENT FR21 FAILED!!!!!") ;
-    AffirmIf(Req_FR22, GetAlertCount = 0, GetTestName & "REQUIREMENT FR22 FAILED!!!!!") ;
-    AffirmIf(Req_FR23, GetAlertCount = 0, GetTestName & "REQUIREMENT FR23 FAILED!!!!!") ; */
-    
     wait for 1 us;
     EndOfTestReports(ReportAll => TRUE);
     TranscriptClose;
@@ -129,7 +121,7 @@ begin
 	log("Receive and check 1000 incrementing values");
 	
 	ExpData := (others => '0');
-	for J in 0 to 500 loop
+	for J in 0 to 999 loop
 		Get(StreamRxRec, RcvData);
 		log("Data Received: " & to_hstring(RcvData), Level => DEBUG);
 		Check(SB,RcvData);
