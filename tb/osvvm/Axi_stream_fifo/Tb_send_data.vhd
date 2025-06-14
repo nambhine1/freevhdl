@@ -93,25 +93,27 @@ begin
   --   Generate transactions for AxiTransmitter
   ------------------------------------------------------------
 	AxiTransmitterProc : process
-		variable TxData : std_logic_vector(DATA_WIDTH-1 downto 0);
-		begin
+		variable rv : RandomPType;
+		variable rand_data : std_logic_vector (DATA_WIDTH - 1 downto 0);
+	begin
 		wait until nReset = '1';
 		WaitForClock(StreamTxRec, 2);
 		
-		log("Send 1000 words with incrementing values");
-		
-		TxData := (others => '0');  -- Start from 0
-		for J in 0 to 500 loop
-			Push (SB,TxData);
-			Send(StreamTxRec, TxData);
-			TxData := std_logic_vector(unsigned(TxData) + 6);
+		rv.InitSeed("AxiTransmitterProc");  -- Use string literal or integer seed
+	
+		log("Send 1000 words with random values");
+	
+		for J in 0 to 999 loop  -- 1000 words
+			rand_data := rv.RandSlv(DATA_WIDTH);  -- match DATA_WIDTH
+			Push(SB, rand_data);
+			Send(StreamTxRec, rand_data);
 		end loop;
-		
+	
 		WaitForClock(StreamTxRec, 2);
 		WaitForBarrier(TestDone);
 		wait;
 	end process AxiTransmitterProc;
-
+	
 
 
   ------------------------------------------------------------
@@ -131,8 +133,6 @@ begin
 		Get(StreamRxRec, RcvData);
 		log("Data Received: " & to_hstring(RcvData), Level => DEBUG);
 		Check(SB,RcvData);
-		--AffirmIfEqual(RcvData, ExpData, "Data received and matched");
-		--ExpData := std_logic_vector(unsigned(ExpData) + 1);
 	end loop;
 	
 	WaitForClock(StreamRxRec, 2);
