@@ -45,7 +45,7 @@ architecture AxiSendGet2 of TestCtrl is
   use      osvvm.ScoreboardPkg_slv.all;
   signal   TestDone : integer_barrier := 1 ;
   signal   SB : ScoreboardIDType;
-  constant Operations_selct : std_logic_vector (1 downto 0) := "01";
+  constant Operations_select : std_logic_vector (1 downto 0) := "01";
 
    
 begin
