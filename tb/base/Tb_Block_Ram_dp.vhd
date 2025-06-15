@@ -27,9 +27,6 @@ architecture Behavioral of tb_Block_Ram_dp is
   signal din_B  : std_logic_vector(DATA_WIDTH-1 downto 0) := (others => '0');
   signal dout_B : std_logic_vector(DATA_WIDTH-1 downto 0);
 
-  -- VUnit runner signal
-  signal runner : runner_t;
-
   constant CLK_PERIOD : time := 10 ns;
 begin
 
@@ -64,8 +61,8 @@ begin
     constant EXPECTED_B2 : std_logic_vector(DATA_WIDTH-1 downto 0) := x"55555555";
     constant EXPECTED_COLLISION : std_logic_vector(DATA_WIDTH-1 downto 0) := x"12345678";
   begin
-    test_runner_setup(runner, runner_cfg);  -- Corrected call
-
+    test_runner_setup(runner, runner_cfg);
+    
     while test_suite loop
       if run("write_and_read_separate_addresses") then
         rst <= '1'; wait for CLK_PERIOD * 2;
@@ -95,7 +92,7 @@ begin
       end if;
     end loop;
 
-    test_runner_cleanup(runner);  -- Corrected to use runner signal
+    test_runner_cleanup(runner);
     wait;
   end process;
 
