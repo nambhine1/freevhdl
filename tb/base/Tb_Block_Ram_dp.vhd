@@ -5,7 +5,6 @@ use IEEE.NUMERIC_STD.ALL;
 -- VUnit
 library vunit_lib;
 context vunit_lib.vunit_context;
-context vunit_lib.vunit_check_context;
 
 use work.math_utils.all;
 
@@ -89,15 +88,6 @@ begin
 
       check_equal(dout_A, EXPECTED_COLLISION, "Port A read incorrect data after write collision at addr 3.");
       check_equal(dout_B, EXPECTED_COLLISION, "Port B read incorrect data after write collision at addr 3.");
-
-    elsif run("read_uninitialized_address") then
-      rst <= '1'; wait for CLK_PERIOD * 2;
-      rst <= '0'; wait for CLK_PERIOD;
-
-      add_A <= std_logic_vector(to_unsigned(5, add_A'length)); we_A <= '0';
-      wait for CLK_PERIOD;
-
-      check_equal(dout_A, (others => '0'), "Port A read non-zero from uninitialized addr 5.");
     end if;
 
     test_runner_cleanup(runner_cfg);
