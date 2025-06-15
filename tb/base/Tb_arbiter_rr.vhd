@@ -21,17 +21,6 @@ architecture Behavioral of tb_arbiter_rr is
 
   constant CLK_PERIOD : time := 10 ns;
 
-  -- Helper function to convert std_logic_vector to string (for messages)
-  function to_string(slv: std_logic_vector) return string is
-    variable result : string(1 to slv'length);
-  begin
-    for i in slv'range loop
-      result(i - slv'low + 1) := character'VALUE(std_ulogic'IMAGE(slv(i)));
-    end loop;
-    return result;
-  end;
-
-  -- Opcode constants and test vectors could be here if needed
 begin
 
   uut: entity work.arbiter_rr
@@ -57,11 +46,10 @@ begin
   end process;
 
   main : process
-    variable runner : vunit_lib.test_runner_t;
   begin
-    test_runner_setup(runner, runner_cfg);
+    test_runner_setup(runner_cfg);
 
-    -- Reset pulse
+    -- Reset
     rst <= '1';
     wait for CLK_PERIOD;
     rst <= '0';
@@ -70,56 +58,54 @@ begin
     if run("test_no_requests") then
       request <= "0000";
       wait for CLK_PERIOD;
-      check_equal(runner, grant, "0000", "Grant mismatch on no requests");
-      check_equal(runner, valid_grant, '0', "Valid grant mismatch on no requests");
+      check_equal(grant, "0000", "Grant mismatch on no requests");
+      check_equal(valid_grant, '0', "Valid mismatch on no requests");
 
     elsif run("test_single_request_0") then
       request <= "1000";
       wait for CLK_PERIOD;
-      check_equal(runner, grant, "1000", "Grant mismatch on request 0");
-      check_equal(runner, valid_grant, '1', "Valid grant mismatch on request 0");
+      check_equal(grant, "1000", "Grant mismatch on request 0");
+      check_equal(valid_grant, '1', "Valid mismatch on request 0");
 
     elsif run("test_single_request_1") then
       request <= "0100";
       wait for CLK_PERIOD;
-      check_equal(runner, grant, "0100", "Grant mismatch on request 1");
-      check_equal(runner, valid_grant, '1', "Valid grant mismatch on request 1");
+      check_equal(grant, "0100", "Grant mismatch on request 1");
+      check_equal(valid_grant, '1', "Valid mismatch on request 1");
 
     elsif run("test_multiple_requests") then
-      -- Example sequence for multiple requests showing round-robin rotation
       request <= "1100";
       wait for CLK_PERIOD;
-      check_equal(runner, grant, "1000", "Grant mismatch step 1");
-      check_equal(runner, valid_grant, '1', "Valid grant mismatch step 1");
+      check_equal(grant, "1000", "Step 1: Grant mismatch");
+      check_equal(valid_grant, '1', "Step 1: Valid mismatch");
 
       request <= "1100";
       wait for CLK_PERIOD;
-      check_equal(runner, grant, "0100", "Grant mismatch step 2");
-      check_equal(runner, valid_grant, '1', "Valid grant mismatch step 2");
+      check_equal(grant, "0100", "Step 2: Grant mismatch");
+      check_equal(valid_grant, '1', "Step 2: Valid mismatch");
 
       request <= "0010";
       wait for CLK_PERIOD;
-      check_equal(runner, grant, "0010", "Grant mismatch step 3");
-      check_equal(runner, valid_grant, '1', "Valid grant mismatch step 3");
+      check_equal(grant, "0010", "Step 3: Grant mismatch");
+      check_equal(valid_grant, '1', "Step 3: Valid mismatch");
 
       request <= "1010";
       wait for CLK_PERIOD;
-      check_equal(runner, grant, "1000", "Grant mismatch step 4");
-      check_equal(runner, valid_grant, '1', "Valid grant mismatch step 4");
+      check_equal(grant, "1000", "Step 4: Grant mismatch");
+      check_equal(valid_grant, '1', "Step 4: Valid mismatch");
 
       request <= "0001";
       wait for CLK_PERIOD;
-      check_equal(runner, grant, "0001", "Grant mismatch step 5");
-      check_equal(runner, valid_grant, '1', "Valid grant mismatch step 5");
+      check_equal(grant, "0001", "Step 5: Grant mismatch");
+      check_equal(valid_grant, '1', "Step 5: Valid mismatch");
 
       request <= "0000";
       wait for CLK_PERIOD;
-      check_equal(runner, grant, "0000", "Grant mismatch step 6");
-      check_equal(runner, valid_grant, '0', "Valid grant mismatch step 6");
-
+      check_equal(grant, "0000", "Step 6: Grant mismatch");
+      check_equal(valid_grant, '0', "Step 6: Valid mismatch");
     end if;
 
-    test_runner_cleanup(runner);
+    test_runner_cleanup;
     wait;
   end process;
 
