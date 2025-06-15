@@ -62,15 +62,12 @@ begin
       dout_B => dout_B
     );
 
-  -- Test process
   main : process
-    variable runner : vunit_lib.test_runner_t;
   begin
-    test_runner_setup(runner, runner_cfg);
+    test_runner_setup(runner_cfg);
 
     ----------------------------------------------------------------------
     if run("write_and_read_separate_addresses") then
-      -- Reset
       rst <= '1';
       wait for CLK_PERIOD * 2;
       rst <= '0';
@@ -81,17 +78,15 @@ begin
       we_B <= '1'; add_B <= std_logic_vector(to_unsigned(2, add_B'length)); din_B <= x"55555555";
       wait for CLK_PERIOD;
 
-      -- Disable write and wait for output
+      -- Disable write, read back
       we_A <= '0'; we_B <= '0';
       wait for CLK_PERIOD;
 
-      -- Check values read back
-      check_equal(dout_A, std_logic_vector(to_unsigned(16#AAAAAAAA#, DATA_WIDTH)), "Port A did not read expected data at addr 1.");
-      check_equal(dout_B, std_logic_vector(to_unsigned(16#55555555#, DATA_WIDTH)), "Port B did not read expected data at addr 2.");
+      check_equal(dout_A, x"AAAAAAAA", "Port A did not read expected data at addr 1.");
+      check_equal(dout_B, x"55555555", "Port B did not read expected data at addr 2.");
 
     ----------------------------------------------------------------------
     elsif run("simultaneous_write_collision_same_address") then
-      -- Reset
       rst <= '1';
       wait for CLK_PERIOD * 2;
       rst <= '0';
@@ -102,33 +97,32 @@ begin
       we_B <= '1'; add_B <= std_logic_vector(to_unsigned(3, add_B'length)); din_B <= x"87654321";
       wait for CLK_PERIOD;
 
-      -- Disable write and wait for output
+      -- Disable write, read back
       we_A <= '0'; we_B <= '0';
       wait for CLK_PERIOD;
 
-      -- Port A has priority, so both should read Port A data
-      check_equal(dout_A, std_logic_vector(to_unsigned(16#12345678#, DATA_WIDTH)), "Port A read incorrect data after write collision at addr 3.");
-      check_equal(dout_B, std_logic_vector(to_unsigned(16#12345678#, DATA_WIDTH)), "Port B read incorrect data after write collision at addr 3.");
+      -- Port A has priority on collision, so expect Port A's data
+      check_equal(dout_A, x"12345678", "Port A read incorrect data after write collision at addr 3.");
+      check_equal(dout_B, x"12345678", "Port B read incorrect data after write collision at addr 3.");
 
     ----------------------------------------------------------------------
     elsif run("read_uninitialized_address") then
-      -- Reset
       rst <= '1';
       wait for CLK_PERIOD * 2;
       rst <= '0';
       wait for CLK_PERIOD;
 
-      -- Read from address never written to (e.g., 5)
+      -- Read from address never written (e.g., addr 5)
       add_A <= std_logic_vector(to_unsigned(5, add_A'length));
       we_A <= '0';
       wait for CLK_PERIOD;
 
-      -- Expect zeros (RAM initialized to zero)
+      -- Expect zero since RAM is initialized to zero
       check_equal(dout_A, (others => '0'), "Port A read non-zero from uninitialized addr 5.");
 
     end if;
 
-    test_runner_cleanup(runner);
+    test_runner_cleanup;
     wait;
   end process;
 
