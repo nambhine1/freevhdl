@@ -38,13 +38,13 @@ jobs:
       run: pip install vunit_hdl
 
     - name: Run VUnit tests FIXED PRIORITY
-      run: python tb_arbiter_fixed_priority.py
+      run: python script/tb_arbiter_fixed_priority.py
       
     - name: Run VUnit tests ALU
-      run: python tb_ALU.py
+      run: python script/tb_ALU.py
       
     - name: Run VUnit tests arbitration round robin
-      run: python Tb_arbiter_rr.py
+      run: python script/Tb_arbiter_rr.py
       
     - name: Upload VUnit test results artifact
       uses: actions/upload-artifact@v4
