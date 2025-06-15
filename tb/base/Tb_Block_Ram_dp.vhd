@@ -82,9 +82,9 @@ begin
       -- Disable write, read back
       we_A <= '0'; we_B <= '0';
       wait for CLK_PERIOD;
-      
-      check_equal(dout_A, x"AAAAAAAA", "Port A did not read expected data at addr 1.");
-      check_equal(dout_B, x"55555555", "Port B did not read expected data at addr 2.");
+
+      check_equal(dout_A, std_logic_vector(to_unsigned(16#AAAAAAAA#, DATA_WIDTH)), "Port A did not read expected data at addr 1.");
+      check_equal(dout_B, std_logic_vector(to_unsigned(16#55555555#, DATA_WIDTH)), "Port B did not read expected data at addr 2.");
 
     ----------------------------------------------------------------------
     elsif run("simultaneous_write_collision_same_address") then
@@ -98,8 +98,8 @@ begin
       wait for CLK_PERIOD;
 
       -- Assuming Port A has priority
-      check_equal(dout_A, x"12345678", "Port A read incorrect data after write collision at addr 3.");
-      check_equal(dout_B, x"12345678", "Port B read incorrect data after write collision at addr 3.");
+      check_equal(dout_A, std_logic_vector(to_unsigned(16#12345678#, DATA_WIDTH)), "Port A read incorrect data after write collision at addr 3.");
+      check_equal(dout_B, std_logic_vector(to_unsigned(16#12345678#, DATA_WIDTH)), "Port B read incorrect data after write collision at addr 3.");
 
     ----------------------------------------------------------------------
     elsif run("read_uninitialized_address") then
@@ -109,7 +109,7 @@ begin
       wait for CLK_PERIOD;
 
       -- Depending on RAM init, expect 0s (most inferred RAM initializes to zero)
-      check_equal(dout_A, x"00000000", "Port A read non-zero from uninitialized addr 5.");
+      check_equal(dout_A, std_logic_vector(to_unsigned(16#00000000#, DATA_WIDTH)), "Port A read non-zero from uninitialized addr 5.");
 
     end if;
 
