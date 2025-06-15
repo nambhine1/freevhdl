@@ -37,8 +37,11 @@ jobs:
     - name: Install VUnit
       run: pip install vunit_hdl
 
-    - name: Run VUnit tests
+    - name: Run VUnit tests FIXED PRIORITY
       run: python tb_arbiter_fixed_priority.py
+      
+    - name: Run VUnit tests ALU
+      run: python tb_ALU.py
 
     - name: Upload VUnit test results artifact
       uses: actions/upload-artifact@v4
