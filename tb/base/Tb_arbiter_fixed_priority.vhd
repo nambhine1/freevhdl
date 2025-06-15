@@ -1,119 +1,102 @@
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+library vunit_lib;
+context vunit_lib.vunit_context;
 
 entity tb_arbiter_fixed_priority is
-end tb_arbiter_fixed_priority;
+    generic (runner_cfg : string);
+end entity;
 
-architecture Behavioral of tb_arbiter_fixed_priority is
+architecture vunit_arch of tb_arbiter_fixed_priority is
 
     constant REQUEST_WIDTH : integer := 3;
 
-    signal clk          : std_logic := '0';
-    signal rst          : std_logic := '0';
-    signal request      : std_logic_vector(REQUEST_WIDTH - 1 downto 0) := (others => '0');
-    signal grant        : std_logic_vector(REQUEST_WIDTH - 1 downto 0);
-    signal valid_grant  : std_logic;
-
-    component arbiter_fixed_priority
-        generic (
-            REQUEST_WIDTH : integer := 3
-        );
-        Port (
-            clk         : in std_logic;
-            rst         : in std_logic;
-            request     : in std_logic_vector (REQUEST_WIDTH -1 downto 0);
-            grant       : out std_logic_vector (REQUEST_WIDTH -1 downto 0);
-            valid_grant : out std_logic
-        );
-    end component;
+    signal clk         : std_logic := '0';
+    signal rst         : std_logic := '0';
+    signal request     : std_logic_vector(REQUEST_WIDTH - 1 downto 0) := (others => '0');
+    signal grant       : std_logic_vector(REQUEST_WIDTH - 1 downto 0);
+    signal valid_grant : std_logic;
 
 begin
 
     -- Clock generation
-    clk_process : process
-    begin
-        while true loop
-            clk <= '0';
-            wait for 5 ns;
-            clk <= '1';
-            wait for 5 ns;
-        end loop;
-    end process;
+    clk <= not clk after 5 ns;
 
-    -- Instantiate DUT
-    DUT: arbiter_fixed_priority
+    -- DUT instantiation
+    DUT: entity work.arbiter_fixed_priority
         generic map (
             REQUEST_WIDTH => REQUEST_WIDTH
         )
         port map (
-            clk => clk,
-            rst => rst,
-            request => request,
-            grant => grant,
+            clk         => clk,
+            rst         => rst,
+            request     => request,
+            grant       => grant,
             valid_grant => valid_grant
         );
 
-    -- Stimulus process
-    stimulus: process
+    -- VUnit test process
+    main : process
     begin
-        -- Apply reset
-        rst <= '1';
-        wait for 10 ns;
-        rst <= '0';
-        wait for 10 ns;
+        test_runner_setup(runner, runner_cfg);
 
-        -- Test 1: No request
-        request <= "000";
-        wait for 10 ns;
-        assert grant = "000" and valid_grant = '0'
-        report "Test 1 Failed: Expected no grant"
-        severity error;
+        if run("No_Request") then
+            rst <= '1';
+            wait for 10 ns;
+            rst <= '0';
+            wait for 10 ns;
 
-        -- Test 2: Only request(0) is high (highest priority)
-        request <= "001";
-        wait for 10 ns;
-        assert grant = "001" and valid_grant = '1'
-        report "Test 2 Failed: Expected grant(0)"
-        severity error;
+            request <= "000";
+            wait for 10 ns;
+            check_equal(grant, "000", "Grant should be none when no requests");
+            check_equal(valid_grant, '0', "Valid_grant should be 0 when no requests");
 
-        -- Test 3: Only request(1) is high
-        request <= "010";
-        wait for 10 ns;
-        assert grant = "010" and valid_grant = '1'
-        report "Test 3 Failed: Expected grant(1)"
-        severity error;
+        elsif run("Request_0") then
+            request <= "001";
+            wait for 10 ns;
+            check_equal(grant, "001", "Grant should be request(0)");
+            check_equal(valid_grant, '1', "Valid_grant should be 1");
 
-        -- Test 4: Only request(2) is high
-        request <= "100";
-        wait for 10 ns;
-        assert grant = "100" and valid_grant = '1'
-        report "Test 4 Failed: Expected grant(2)"
-        severity error;
+        elsif run("Request_1") then
+            request <= "010";
+            wait for 10 ns;
+            check_equal(grant, "010", "Grant should be request(1)");
+            check_equal(valid_grant, '1');
 
-        -- Test 5: Multiple requests (0 and 2) – should grant 0
-        request <= "101";
-        wait for 10 ns;
-        assert grant = "001" and valid_grant = '1'
-        report "Test 5 Failed: Expected grant(0) as highest priority"
-        severity error;
+        elsif run("Request_2") then
+            request <= "100";
+            wait for 10 ns;
+            check_equal(grant, "100", "Grant should be request(2)");
+            check_equal(valid_grant, '1');
 
-        -- Test 6: All requests active – should grant 0
-        request <= "111";
-        wait for 10 ns;
-        assert grant = "001" and valid_grant = '1'
-        report "Test 6 Failed: Expected grant(0) as highest priority"
-        severity error;
+        elsif run("Request_0_and_2") then
+            request <= "101";
+            wait for 10 ns;
+            check_equal(grant, "001", "Grant should be request(0) due to priority");
+            check_equal(valid_grant, '1');
 
-        -- Test 7: Reset again and check outputs clear
-        rst <= '1';
-        wait for 10 ns;
-        assert grant = "000" and valid_grant = '0'
-        report "Test 7 Failed: Expected outputs to reset"
-        severity error;
+        elsif run("All_Requests") then
+            request <= "111";
+            wait for 10 ns;
+            check_equal(grant, "001", "Grant should be request(0) due to highest priority");
+            check_equal(valid_grant, '1');
 
-        report "All tests passed." severity note;
-        wait;
+        elsif run("Reset_Test") then
+            rst <= '1';
+            wait for 10 ns;
+            rst <= '0';
+            request <= "111";
+            wait for 10 ns;
+            rst <= '1';
+            wait for 10 ns;
+            check_equal(grant, "000", "Grant should be cleared on reset");
+            check_equal(valid_grant, '0', "Valid_grant should be 0 after reset");
 
+        end if;
+
+        test_runner_cleanup(runner);
     end process;
 
-end Behavioral;
+end architecture;
