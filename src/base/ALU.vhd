@@ -68,7 +68,7 @@ begin
 
   -- Outputs
   result <= std_logic_vector(result_reg(DATA_WIDTH - 1 downto 0));
-  zero   <= '1' when result_reg(DATA_WIDTH - 1 downto 0) = (others => '0') else '0';
+  zero   <= '1' when result_reg(DATA_WIDTH - 1 downto 0) = x"00000000" else '0';
   carry  <= result_reg(DATA_WIDTH);
 
 end Behavioral;
