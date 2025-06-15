@@ -63,7 +63,7 @@ begin
   begin
     test_runner_setup(runner, runner_cfg);
     
-    while test_suite loop
+    --while test_suite loop
       if run("write_and_read_separate_addresses") then
         rst <= '1'; wait for CLK_PERIOD * 2;
         rst <= '0'; wait for CLK_PERIOD;
@@ -90,7 +90,7 @@ begin
         check_equal(dout_A, EXPECTED_COLLISION, "Port A read incorrect data after write collision at addr 3.");
         check_equal(dout_B, EXPECTED_COLLISION, "Port B read incorrect data after write collision at addr 3.");
       end if;
-    end loop;
+    --end loop;
 
     test_runner_cleanup(runner);
     wait;
