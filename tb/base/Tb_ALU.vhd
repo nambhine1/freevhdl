@@ -13,21 +13,22 @@ architecture Behavioral of tb_ALU is
 
   constant DATA_WIDTH : integer := 4;
 
-  signal A, B       : std_logic_vector(DATA_WIDTH - 1 downto 0) := (others => '0');
-  signal opcode     : std_logic_vector(DATA_WIDTH - 1 downto 0) := (others => '0');
-  signal result     : std_logic_vector(DATA_WIDTH - 1 downto 0);
-  signal zero       : std_logic;
-  signal carry      : std_logic;
+  signal A      : std_logic_vector(DATA_WIDTH - 1 downto 0) := (others => '0');
+  signal B      : std_logic_vector(DATA_WIDTH - 1 downto 0) := (others => '0');
+  signal opcode : std_logic_vector(3 downto 0) := (others => '0');  -- fixed 4 bits opcode
+  signal result : std_logic_vector(DATA_WIDTH - 1 downto 0);
+  signal zero   : std_logic;
+  signal carry  : std_logic;
 
-  -- Opcode constants
-  constant OPCODE_ADD  : std_logic_vector(DATA_WIDTH - 1 downto 0) := "0000";
-  constant OPCODE_SUB  : std_logic_vector(DATA_WIDTH - 1 downto 0) := "0001";
-  constant OPCODE_AND  : std_logic_vector(DATA_WIDTH - 1 downto 0) := "0010";
-  constant OPCODE_OR   : std_logic_vector(DATA_WIDTH - 1 downto 0) := "0011";
-  constant OPCODE_XOR  : std_logic_vector(DATA_WIDTH - 1 downto 0) := "0100";
-  constant OPCODE_NOT  : std_logic_vector(DATA_WIDTH - 1 downto 0) := "0101";
-  constant OPCODE_SHL  : std_logic_vector(DATA_WIDTH - 1 downto 0) := "0110";
-  constant OPCODE_SHR  : std_logic_vector(DATA_WIDTH - 1 downto 0) := "0111";
+  -- Opcode constants, fixed 4 bits wide now
+  constant OPCODE_ADD  : std_logic_vector(3 downto 0) := "0000";
+  constant OPCODE_SUB  : std_logic_vector(3 downto 0) := "0001";
+  constant OPCODE_AND  : std_logic_vector(3 downto 0) := "0010";
+  constant OPCODE_OR   : std_logic_vector(3 downto 0) := "0011";
+  constant OPCODE_XOR  : std_logic_vector(3 downto 0) := "0100";
+  constant OPCODE_NOT  : std_logic_vector(3 downto 0) := "0101";
+  constant OPCODE_SHL  : std_logic_vector(3 downto 0) := "0110";
+  constant OPCODE_SHR  : std_logic_vector(3 downto 0) := "0111";
 
 begin
 
