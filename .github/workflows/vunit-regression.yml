@@ -42,7 +42,10 @@ jobs:
       
     - name: Run VUnit tests ALU
       run: python tb_ALU.py
-
+      
+    - name: Run VUnit tests arbitration round robin
+      run: python Tb_arbiter_rr.py
+      
     - name: Upload VUnit test results artifact
       uses: actions/upload-artifact@v4
       with:
