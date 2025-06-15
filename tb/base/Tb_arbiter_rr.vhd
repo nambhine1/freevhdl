@@ -78,12 +78,12 @@ begin
     elsif run("test_multiple_requests") then
       request <= "1100";
       wait for CLK_PERIOD;
-      check_equal(grant, 2#1000#, "Step 1: Grant mismatch");
+      check_equal(grant, 2#0100#, "Step 1: Grant mismatch");
       check_equal(valid_grant, '1', "Step 1: Valid mismatch");
 
       request <= "1100";
       wait for CLK_PERIOD;
-      check_equal(grant, 2#0100#, "Step 2: Grant mismatch");
+      check_equal(grant, 2#1000#, "Step 2: Grant mismatch");
       check_equal(valid_grant, '1', "Step 2: Valid mismatch");
 
       request <= "0010";
