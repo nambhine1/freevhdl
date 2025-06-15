@@ -1,7 +1,6 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
-use work.math_utils.all;
 
 library vunit_lib;
 context vunit_lib.vunit_context;
@@ -32,7 +31,6 @@ architecture Behavioral of tb_Block_Ram_dp is
 
 begin
 
-  -- Clock generation
   clk_process : process
   begin
     while true loop
@@ -43,7 +41,6 @@ begin
     end loop;
   end process;
 
-  -- DUT instantiation
   DUT: entity work.Block_Ram_dp
     generic map (
       DATA_WIDTH => DATA_WIDTH,
@@ -63,66 +60,60 @@ begin
     );
 
   main : process
+    variable runner : vunit_lib.test_runner_t;
+    constant EXPECTED_A1 : std_logic_vector(DATA_WIDTH-1 downto 0) := x"AAAAAAAA";
+    constant EXPECTED_B2 : std_logic_vector(DATA_WIDTH-1 downto 0) := x"55555555";
+    constant EXPECTED_COLLISION : std_logic_vector(DATA_WIDTH-1 downto 0) := x"12345678";
   begin
-    test_runner_setup(runner_cfg);
+    test_runner_setup(runner, runner_cfg);
 
-    ----------------------------------------------------------------------
     if run("write_and_read_separate_addresses") then
       rst <= '1';
       wait for CLK_PERIOD * 2;
       rst <= '0';
       wait for CLK_PERIOD;
 
-      -- Write to address 1 and 2 simultaneously
-      we_A <= '1'; add_A <= std_logic_vector(to_unsigned(1, add_A'length)); din_A <= x"AAAAAAAA";
-      we_B <= '1'; add_B <= std_logic_vector(to_unsigned(2, add_B'length)); din_B <= x"55555555";
+      we_A <= '1'; add_A <= std_logic_vector(to_unsigned(1, add_A'length)); din_A <= EXPECTED_A1;
+      we_B <= '1'; add_B <= std_logic_vector(to_unsigned(2, add_B'length)); din_B <= EXPECTED_B2;
       wait for CLK_PERIOD;
 
-      -- Disable write, read back
       we_A <= '0'; we_B <= '0';
       wait for CLK_PERIOD;
 
-      check_equal(dout_A, x"AAAAAAAA", "Port A did not read expected data at addr 1.");
-      check_equal(dout_B, x"55555555", "Port B did not read expected data at addr 2.");
+      check_equal(dout_A, EXPECTED_A1, "Port A did not read expected data at addr 1.");
+      check_equal(dout_B, EXPECTED_B2, "Port B did not read expected data at addr 2.");
 
-    ----------------------------------------------------------------------
     elsif run("simultaneous_write_collision_same_address") then
       rst <= '1';
       wait for CLK_PERIOD * 2;
       rst <= '0';
       wait for CLK_PERIOD;
 
-      -- Write different values to the SAME address on both ports simultaneously
-      we_A <= '1'; add_A <= std_logic_vector(to_unsigned(3, add_A'length)); din_A <= x"12345678";
+      we_A <= '1'; add_A <= std_logic_vector(to_unsigned(3, add_A'length)); din_A <= EXPECTED_COLLISION;
       we_B <= '1'; add_B <= std_logic_vector(to_unsigned(3, add_B'length)); din_B <= x"87654321";
       wait for CLK_PERIOD;
 
-      -- Disable write, read back
       we_A <= '0'; we_B <= '0';
       wait for CLK_PERIOD;
 
-      -- Port A has priority on collision, so expect Port A's data
-      check_equal(dout_A, x"12345678", "Port A read incorrect data after write collision at addr 3.");
-      check_equal(dout_B, x"12345678", "Port B read incorrect data after write collision at addr 3.");
+      check_equal(dout_A, EXPECTED_COLLISION, "Port A read incorrect data after write collision at addr 3.");
+      check_equal(dout_B, EXPECTED_COLLISION, "Port B read incorrect data after write collision at addr 3.");
 
-    ----------------------------------------------------------------------
     elsif run("read_uninitialized_address") then
       rst <= '1';
       wait for CLK_PERIOD * 2;
       rst <= '0';
       wait for CLK_PERIOD;
 
-      -- Read from address never written (e.g., addr 5)
       add_A <= std_logic_vector(to_unsigned(5, add_A'length));
       we_A <= '0';
       wait for CLK_PERIOD;
 
-      -- Expect zero since RAM is initialized to zero
       check_equal(dout_A, (others => '0'), "Port A read non-zero from uninitialized addr 5.");
 
     end if;
 
-    test_runner_cleanup;
+    test_runner_cleanup(runner);
     wait;
   end process;
 
