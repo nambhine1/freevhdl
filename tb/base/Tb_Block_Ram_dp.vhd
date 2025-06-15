@@ -90,7 +90,7 @@ begin
       check_equal(dout_B, EXPECTED_COLLISION, "Port B read incorrect data after write collision at addr 3.");
     end if;
 
-    test_runner_cleanup(runner_cfg);
+    test_runner_cleanup(runner);
     wait;
   end process;
 
