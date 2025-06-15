@@ -7,8 +7,9 @@ vu = VUnit.from_argv()
 lib = vu.add_library("lib")
 
 # Add source files
-lib.add_source_files("src/base/Block_Ram_dp.vhd")
 lib.add_source_files("src/library/math_utils.vhd")
+lib.add_source_files("src/base/Block_Ram_dp.vhd")
+
 
 
 # Add testbench files
