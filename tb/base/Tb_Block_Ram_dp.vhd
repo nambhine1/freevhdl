@@ -27,6 +27,9 @@ architecture Behavioral of tb_Block_Ram_dp is
   signal din_B  : std_logic_vector(DATA_WIDTH-1 downto 0) := (others => '0');
   signal dout_B : std_logic_vector(DATA_WIDTH-1 downto 0);
 
+  -- VUnit runner signal
+  signal runner : runner_t;
+
   constant CLK_PERIOD : time := 10 ns;
 begin
 
@@ -67,7 +70,7 @@ begin
     constant EXPECTED_PAR_B      : std_logic_vector(DATA_WIDTH-1 downto 0) := x"0B0B0B0B";
     constant EXPECTED_UNINIT_VAL : std_logic_vector(DATA_WIDTH-1 downto 0) := (others => '0');
   begin
-    test_runner_setup(runner_cfg);
+    test_runner_setup(runner, runner_cfg);  -- Corrected to include runner signal
 
     while test_suite loop
       if run("write_and_read_separate_addresses") then
