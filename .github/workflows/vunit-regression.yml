@@ -46,6 +46,9 @@ jobs:
     - name: Run VUnit tests arbitration round robin
       run: python script/Tb_arbiter_rr.py
       
+    - name: Run VUnit tests arbitration block run dual port 
+      run: python script/Tb_Block_Ram_dp.py
+      
     - name: Upload VUnit test results artifact
       uses: actions/upload-artifact@v4
       with:
