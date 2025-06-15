@@ -27,6 +27,9 @@ architecture Behavioral of tb_Block_Ram_dp is
   signal din_B  : std_logic_vector(DATA_WIDTH-1 downto 0) := (others => '0');
   signal dout_B : std_logic_vector(DATA_WIDTH-1 downto 0);
 
+  -- VUnit runner signal
+  signal runner : runner_t;
+
   constant CLK_PERIOD : time := 10 ns;
 begin
 
@@ -61,36 +64,38 @@ begin
     constant EXPECTED_B2 : std_logic_vector(DATA_WIDTH-1 downto 0) := x"55555555";
     constant EXPECTED_COLLISION : std_logic_vector(DATA_WIDTH-1 downto 0) := x"12345678";
   begin
-    test_runner_setup(runner_cfg);
+    test_runner_setup(runner, runner_cfg);  -- Corrected call
 
-    if run("write_and_read_separate_addresses") then
-      rst <= '1'; wait for CLK_PERIOD * 2;
-      rst <= '0'; wait for CLK_PERIOD;
+    while test_suite loop
+      if run("write_and_read_separate_addresses") then
+        rst <= '1'; wait for CLK_PERIOD * 2;
+        rst <= '0'; wait for CLK_PERIOD;
 
-      we_A <= '1'; add_A <= std_logic_vector(to_unsigned(1, add_A'length)); din_A <= EXPECTED_A1;
-      we_B <= '1'; add_B <= std_logic_vector(to_unsigned(2, add_B'length)); din_B <= EXPECTED_B2;
-      wait for CLK_PERIOD;
+        we_A <= '1'; add_A <= std_logic_vector(to_unsigned(1, add_A'length)); din_A <= EXPECTED_A1;
+        we_B <= '1'; add_B <= std_logic_vector(to_unsigned(2, add_B'length)); din_B <= EXPECTED_B2;
+        wait for CLK_PERIOD;
 
-      we_A <= '0'; we_B <= '0'; wait for CLK_PERIOD;
+        we_A <= '0'; we_B <= '0'; wait for CLK_PERIOD;
 
-      check_equal(dout_A, EXPECTED_A1, "Port A did not read expected data at addr 1.");
-      check_equal(dout_B, EXPECTED_B2, "Port B did not read expected data at addr 2.");
+        check_equal(dout_A, EXPECTED_A1, "Port A did not read expected data at addr 1.");
+        check_equal(dout_B, EXPECTED_B2, "Port B did not read expected data at addr 2.");
 
-    elsif run("simultaneous_write_collision_same_address") then
-      rst <= '1'; wait for CLK_PERIOD * 2;
-      rst <= '0'; wait for CLK_PERIOD;
+      elsif run("simultaneous_write_collision_same_address") then
+        rst <= '1'; wait for CLK_PERIOD * 2;
+        rst <= '0'; wait for CLK_PERIOD;
 
-      we_A <= '1'; add_A <= std_logic_vector(to_unsigned(3, add_A'length)); din_A <= EXPECTED_COLLISION;
-      we_B <= '1'; add_B <= std_logic_vector(to_unsigned(3, add_B'length)); din_B <= x"87654321";
-      wait for CLK_PERIOD;
+        we_A <= '1'; add_A <= std_logic_vector(to_unsigned(3, add_A'length)); din_A <= EXPECTED_COLLISION;
+        we_B <= '1'; add_B <= std_logic_vector(to_unsigned(3, add_B'length)); din_B <= x"87654321";
+        wait for CLK_PERIOD;
 
-      we_A <= '0'; we_B <= '0'; wait for CLK_PERIOD;
+        we_A <= '0'; we_B <= '0'; wait for CLK_PERIOD;
 
-      check_equal(dout_A, EXPECTED_COLLISION, "Port A read incorrect data after write collision at addr 3.");
-      check_equal(dout_B, EXPECTED_COLLISION, "Port B read incorrect data after write collision at addr 3.");
-    end if;
+        check_equal(dout_A, EXPECTED_COLLISION, "Port A read incorrect data after write collision at addr 3.");
+        check_equal(dout_B, EXPECTED_COLLISION, "Port B read incorrect data after write collision at addr 3.");
+      end if;
+    end loop;
 
-    test_runner_cleanup(runner);
+    test_runner_cleanup(runner);  -- Corrected to use runner signal
     wait;
   end process;
 
