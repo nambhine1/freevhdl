@@ -23,6 +23,7 @@ architecture Behavioral of tb_arbiter_rr is
 
 begin
 
+  -- Instantiate the unit under test (UUT)
   uut: entity work.arbiter_rr
     generic map (
       REQUEST_WIDTH => REQUEST_WIDTH
@@ -35,6 +36,7 @@ begin
       valid_grant => valid_grant
     );
 
+  -- Clock generation
   clk_process : process
   begin
     while true loop
@@ -45,10 +47,10 @@ begin
     end loop;
   end process;
 
+  -- Test process
   main : process
   begin
-    test_runner_setup(runner_cfg);
-
+    test_runner_setup(runner, runner_cfg);
     -- Reset
     rst <= '1';
     wait for CLK_PERIOD;
@@ -58,7 +60,7 @@ begin
     if run("test_no_requests") then
       request <= "0000";
       wait for CLK_PERIOD;
-      check_equal(grant, 2#0000# , "Grant mismatch on no requests");
+      check_equal(grant, 2#0000#, "Grant mismatch on no requests");
       check_equal(valid_grant, '0', "Valid mismatch on no requests");
 
     elsif run("test_single_request_0") then
@@ -76,7 +78,7 @@ begin
     elsif run("test_multiple_requests") then
       request <= "1100";
       wait for CLK_PERIOD;
-      check_equal(grant,2#1000#, "Step 1: Grant mismatch");
+      check_equal(grant, 2#1000#, "Step 1: Grant mismatch");
       check_equal(valid_grant, '1', "Step 1: Valid mismatch");
 
       request <= "1100";
@@ -105,7 +107,7 @@ begin
       check_equal(valid_grant, '0', "Step 6: Valid mismatch");
     end if;
 
-    test_runner_cleanup;
+    test_runner_cleanup(runner);
     wait;
   end process;
 
