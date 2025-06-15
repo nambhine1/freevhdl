@@ -2,8 +2,11 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
+-- VUnit
 library vunit_lib;
 context vunit_lib.vunit_context;
+context vunit_lib.vunit_check_context;
+
 use work.math_utils.all;
 
 entity tb_Block_Ram_dp is
@@ -55,12 +58,11 @@ begin
     );
 
   main : process
-    variable runner : vunit_lib.test_runner_t;
     constant EXPECTED_A1 : std_logic_vector(DATA_WIDTH-1 downto 0) := x"AAAAAAAA";
     constant EXPECTED_B2 : std_logic_vector(DATA_WIDTH-1 downto 0) := x"55555555";
     constant EXPECTED_COLLISION : std_logic_vector(DATA_WIDTH-1 downto 0) := x"12345678";
   begin
-    test_runner_setup(runner, runner_cfg);
+    test_runner_setup(runner_cfg);
 
     if run("write_and_read_separate_addresses") then
       rst <= '1'; wait for CLK_PERIOD * 2;
@@ -98,7 +100,7 @@ begin
       check_equal(dout_A, (others => '0'), "Port A read non-zero from uninitialized addr 5.");
     end if;
 
-    test_runner_cleanup(runner);
+    test_runner_cleanup(runner_cfg);
     wait;
   end process;
 
