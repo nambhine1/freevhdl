@@ -3,17 +3,17 @@
 
 **FreeVHDL** is a collection of reusable, open-source VHDL code snippets and modules designed to support hardware design, learning, and rapid prototyping. This repository aims to be a comprehensive resource for students, engineers, and enthusiasts working with FPGA and ASIC designs.
 
-##  Features
+## Features
 
-- Ready-to-use VHDL components
-- Portable and synthesisable code
-- Modular and well-organized structure
-- Testbenches included for most components
-- Scripts for automating common simulation tasks
+- Ready-to-use VHDL components  
+- Portable and synthesizable code  
+- Modular and well-organized structure  
+- Testbenches included for most components  
+- Scripts for automating common simulation tasks  
 
 ---
 
-##  Project Structure
+## Project Structure
 
 ```
 freevhdl/
@@ -34,10 +34,21 @@ freevhdl/
 ├── doc/             # Documentation, diagrams, datasheets
 │   └── overview.pdf
 │
-├── .github/         # GitHub Actions CI (if applicable)
+├── .github/         # GitHub Actions CI 
 │
-└── README.md        # Project documentation (this file)
+└── README.md        # Project documentation
 ```
+
+---
+
+## Simulation Frameworks
+
+This repository leverages **OSVVM** (Open Source VHDL Verification Methodology) and **VUnit** to enhance the simulation and verification of the VHDL modules. These frameworks provide advanced testbench capabilities and automation to thoroughly verify the behavior of the IP.
+
+- **OSVVM**: Provides advanced verification features including random stimulus generation, coverage, and verification components for high-quality testbenches.  
+- **VUnit**: An open-source VHDL unit testing framework that automates simulation runs, improves test organization, and integrates well with continuous integration workflows.
+
+Together, these tools help ensure robust, scalable, and repeatable simulation of all modules included in this repository.
 
 ---
 
@@ -47,32 +58,34 @@ freevhdl/
 
 To simulate the VHDL modules, you can use:
 
-- [GHDL](https://ghdl.github.io/ghdl/) – Open-source VHDL simulator
-- [GTKWave](http://gtkwave.sourceforge.net/) – Waveform viewer
-- Alternatively: ModelSim, XSIM (Xilinx), or EDA Playground
-
-##  Contributing
-
-Contributions are welcome! Feel free to open issues or pull requests for:
-
-- New VHDL modules
-- Bug fixes or optimizations
-- Improved documentation or testbenches
+- [GHDL](https://ghdl.github.io/ghdl/) – Open-source VHDL simulator  
+- [GTKWave](http://gtkwave.sourceforge.net/) – Waveform viewer  
+- Alternatively: ModelSim, XSIM (Xilinx), or EDA Playground  
 
 ---
 
-##  License
+## Contributing
+
+Contributions are welcome! Feel free to open issues or pull requests for:
+
+- New VHDL modules  
+- Bug fixes or optimizations  
+- Improved documentation or testbenches  
+
+---
+
+## License
 
 This project is licensed under the MIT License. See `LICENSE` for details.
 
 ---
 
-##  Authors
+## Authors
 
 Maintained by [Nambinina Rakotojaona](https://github.com/nambhine1).
 
 ---
 
-##  Contact
+## Contact
 
 For suggestions or queries, open an [issue](https://github.com/nambhine1/freevhdl/issues).
