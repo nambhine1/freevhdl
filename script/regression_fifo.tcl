@@ -1,7 +1,7 @@
-source ../src/library/OsvvmLibraries/Scripts/StartUp.tcl
+source src/library/OsvvmLibraries/Scripts/StartUp.tcl
 variable OMIT_XILINX_FILES 0
 
-build ../src/library/OsvvmLibraries/OsvvmLibraries.pro
+build src/library/OsvvmLibraries/OsvvmLibraries.pro
       
 if {$::osvvm::ToolName eq "GHDL"} {
     set OMIT_XILINX_FILES 1
@@ -25,6 +25,7 @@ if {$::osvvm::ToolName eq "QuestaSim"} {
 }
 
 
-build ../src/axi/src.pro
 
-build ../tb/osvvm/Frame_gen/TestHarness_frame_gen.pro
+build  src/library/math_utils.pro
+build src/axi/src.pro
+build tb/osvvm/Axi_stream_fifo/TestHarness_fifo.pro

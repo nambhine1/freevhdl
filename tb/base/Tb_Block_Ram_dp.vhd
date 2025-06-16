@@ -1,44 +1,43 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
-use work.math_utils.all;  -- Use the same math_utils as DUT
+
+-- VUnit
+library vunit_lib;
+context vunit_lib.vunit_context;
+
+use work.math_utils.all;
 
 entity tb_Block_Ram_dp is
+  generic (runner_cfg : string);
 end entity;
 
 architecture Behavioral of tb_Block_Ram_dp is
-
   constant DATA_WIDTH : integer := 32;
   constant RAM_DEPTH  : integer := 32;
 
-  -- Signals for DUT
   signal clk    : std_logic := '0';
   signal rst    : std_logic := '1';
-
   signal we_A   : std_logic := '0';
   signal add_A  : std_logic_vector(clog2(RAM_DEPTH)-1 downto 0) := (others => '0');
   signal din_A  : std_logic_vector(DATA_WIDTH-1 downto 0) := (others => '0');
   signal dout_A : std_logic_vector(DATA_WIDTH-1 downto 0);
-
   signal we_B   : std_logic := '0';
   signal add_B  : std_logic_vector(clog2(RAM_DEPTH)-1 downto 0) := (others => '0');
   signal din_B  : std_logic_vector(DATA_WIDTH-1 downto 0) := (others => '0');
   signal dout_B : std_logic_vector(DATA_WIDTH-1 downto 0);
 
+  constant CLK_PERIOD : time := 10 ns;
 begin
 
-  -- Clock generation 10ns period
   clk_process : process
   begin
     while true loop
-      clk <= '0';
-      wait for 5 ns;
-      clk <= '1';
-      wait for 5 ns;
+      clk <= '0'; wait for CLK_PERIOD / 2;
+      clk <= '1'; wait for CLK_PERIOD / 2;
     end loop;
   end process;
 
-  -- Instantiate DUT
   DUT: entity work.Block_Ram_dp
     generic map (
       DATA_WIDTH => DATA_WIDTH,
@@ -57,51 +56,43 @@ begin
       dout_B => dout_B
     );
 
-  -- Test process
-  test_process : process
+  main : process
+    constant EXPECTED_A1 : std_logic_vector(DATA_WIDTH-1 downto 0) := x"AAAAAAAA";
+    constant EXPECTED_B2 : std_logic_vector(DATA_WIDTH-1 downto 0) := x"55555555";
+    constant EXPECTED_COLLISION : std_logic_vector(DATA_WIDTH-1 downto 0) := x"12345678";
   begin
-    -- Reset RAM
-    rst <= '1';
-    wait for 20 ns;
-    rst <= '0';
-    wait for 10 ns;
+    test_runner_setup(runner, runner_cfg);
+    
+    --while test_suite loop
+      if run("write_and_read_separate_addresses") then
+        rst <= '1'; wait for CLK_PERIOD * 2;
+        rst <= '0'; wait for CLK_PERIOD;
 
-    -- Write different data to different addresses simultaneously on both ports
-    we_A <= '1'; add_A <= std_logic_vector(to_unsigned(1, add_A'length)); din_A <= x"AAAAAAAA";  -- Address 1
-    we_B <= '1'; add_B <= std_logic_vector(to_unsigned(2, add_B'length)); din_B <= x"55555555";  -- Address 2
-    wait for 10 ns; -- Rising edge, write occurs
+        we_A <= '1'; add_A <= std_logic_vector(to_unsigned(1, add_A'length)); din_A <= EXPECTED_A1;
+        we_B <= '1'; add_B <= std_logic_vector(to_unsigned(2, add_B'length)); din_B <= EXPECTED_B2;
+        wait for CLK_PERIOD;
 
-    -- Disable writes, read back data
-    we_A <= '0'; we_B <= '0';
-    wait for 10 ns; -- read data output updated
+        we_A <= '0'; we_B <= '0'; wait for CLK_PERIOD;
 
-    -- Check data read from both ports
-    assert dout_A = x"AAAAAAAA"
-      report "Test failed: Port A did not read expected data after write."
-      severity error;
-    assert dout_B = x"55555555"
-      report "Test failed: Port B did not read expected data after write."
-      severity error;
+        check_equal(dout_A, EXPECTED_A1, "Port A did not read expected data at addr 1.");
+        check_equal(dout_B, EXPECTED_B2, "Port B did not read expected data at addr 2.");
 
-    -- Now write different data to the SAME address on both ports simultaneously
-    we_A <= '1'; add_A <= std_logic_vector(to_unsigned(3, add_A'length)); din_A <= x"12345678";  -- Address 3
-    we_B <= '1'; add_B <= std_logic_vector(to_unsigned(3, add_B'length)); din_B <= x"87654321";  -- Same Address 3
-    wait for 10 ns; -- rising edge
+      elsif run("simultaneous_write_collision_same_address") then
+        rst <= '1'; wait for CLK_PERIOD * 2;
+        rst <= '0'; wait for CLK_PERIOD;
 
-    -- Disable writes, read back
-    we_A <= '0'; we_B <= '0';
-    wait for 10 ns;
+        we_A <= '1'; add_A <= std_logic_vector(to_unsigned(3, add_A'length)); din_A <= EXPECTED_COLLISION;
+        we_B <= '1'; add_B <= std_logic_vector(to_unsigned(3, add_B'length)); din_B <= x"87654321";
+        wait for CLK_PERIOD;
 
-    -- According to code, Port A write has priority, so RAM content at address 3 should be din_A
-    assert dout_A = x"12345678"
-      report "Test failed: Port A read incorrect data after simultaneous write collision."
-      severity error;
-    assert dout_B = x"12345678"
-      report "Test failed: Port B read incorrect data after simultaneous write collision."
-      severity error;
+        we_A <= '0'; we_B <= '0'; wait for CLK_PERIOD;
 
-    -- Finish simulation
-    report "All tests passed.";
+        check_equal(dout_A, EXPECTED_COLLISION, "Port A read incorrect data after write collision at addr 3.");
+        check_equal(dout_B, EXPECTED_COLLISION, "Port B read incorrect data after write collision at addr 3.");
+      end if;
+    --end loop;
+
+    test_runner_cleanup(runner);
     wait;
   end process;
 

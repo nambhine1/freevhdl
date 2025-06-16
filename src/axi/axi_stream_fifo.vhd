@@ -70,7 +70,7 @@ begin
     fifo_proc : process(clk)
     begin
         if rising_edge(clk) then
-            if rst = '1' then
+            if rst = '0' then
                 count       <= (others => '0');
                 wr_indx     <= (others => '0');
                 rd_indx     <= (others => '0');

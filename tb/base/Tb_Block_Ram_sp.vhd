@@ -2,31 +2,36 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
+-- VUnit
+library vunit_lib;
+context vunit_lib.vunit_context;
+
 use work.math_utils.all;
 
 entity Block_Ram_tb is
+  generic (runner_cfg : string);
 end entity;
 
 architecture sim of Block_Ram_tb is
 
-  -- Test parameters
+  -- Configuration constants
   constant RAM_DEPTH  : integer := 8;
   constant DATA_WIDTH : integer := 8;
   constant ADDR_WIDTH : integer := clog2(RAM_DEPTH);
+  constant CLK_PERIOD : time := 10 ns;
+  constant RAM_MODE   : string := "RBW";  -- Change to "WBR" to test other mode
 
+  -- Signals
   signal clk   : std_logic := '0';
   signal rst   : std_logic := '1';
   signal we    : std_logic := '0';
-  signal addr  : std_logic_vector(ADDR_WIDTH - 1 downto 0) := (others => '0');
-  signal din   : std_logic_vector(DATA_WIDTH - 1 downto 0) := (others => '0');
+  signal addr  : std_logic_vector(ADDR_WIDTH - 1 downto 0) := std_logic_vector(to_unsigned(0, ADDR_WIDTH));
+  signal din   : std_logic_vector(DATA_WIDTH - 1 downto 0) := std_logic_vector(to_unsigned(0, DATA_WIDTH));
   signal dout  : std_logic_vector(DATA_WIDTH - 1 downto 0);
-
-  -- RAM mode under test
-  constant RAM_MODE : string := "RBW";  -- change to "WBR" to test the other mode
 
 begin
 
-  -- Instantiate DUT
+  -- DUT instantiation
   DUT: entity work.Block_Ram
     generic map (
       RAM_DEPTH  => RAM_DEPTH,
@@ -45,79 +50,84 @@ begin
   -- Clock generation
   clk_proc: process
   begin
-    wait for 5 ns;
-    clk <= not clk;
+    while true loop
+      clk <= '0'; wait for CLK_PERIOD / 2;
+      clk <= '1'; wait for CLK_PERIOD / 2;
+    end loop;
   end process;
 
   -- Test process
-  stim_proc: process
+  main: process
     variable expected : std_logic_vector(DATA_WIDTH - 1 downto 0);
   begin
+    test_runner_setup(runner, runner_cfg);
+
     -- Reset
-    wait for 10 ns;
-    rst <= '0';
-    wait for 10 ns;
+    rst <= '1'; wait for 2 * CLK_PERIOD;
+    rst <= '0'; wait for CLK_PERIOD;
 
-    -------------------------------------------------
-    -- Write to address 1, then read from address 1
-    -------------------------------------------------
-    addr <= std_logic_vector(to_unsigned(1, ADDR_WIDTH));
-    din  <= x"AB";
-    we   <= '1';
-    wait for 10 ns;
+    if run("read memory without write") then
+      addr <= std_logic_vector(to_unsigned(1, ADDR_WIDTH));
+      wait for CLK_PERIOD;
+      check_equal(dout, std_logic_vector(to_unsigned(0, DATA_WIDTH)), "Reading uninitialized memory should return 0");
 
-    -- In "WBR", value should appear on dout in same cycle
-    -- In "RBW", value appears in next read
-    we   <= '0';
-    din  <= (others => '0');  -- clear input
+    elsif run("write and immediate read") then
+      addr <= std_logic_vector(to_unsigned(2, ADDR_WIDTH));
+      din  <= std_logic_vector(to_unsigned(50, DATA_WIDTH));
+      we   <= '1'; wait for CLK_PERIOD;
+      we   <= '0'; wait for CLK_PERIOD;
+      check_equal(dout, std_logic_vector(to_unsigned(50, DATA_WIDTH)), "Immediate read after write failed");
 
-    wait for 10 ns;
+    elsif run("write all locations and verify") then
+      for i in 0 to RAM_DEPTH - 1 loop
+        addr <= std_logic_vector(to_unsigned(i, ADDR_WIDTH));
+        din  <= std_logic_vector(to_unsigned(i * 10, DATA_WIDTH));
+        we   <= '1';
+        wait for CLK_PERIOD;
+      end loop;
+      we <= '0';
 
-    if RAM_MODE = "WBR" then
-      expected := x"AB";
-      assert dout = expected
-        report "WBR: Write not reflected correctly on dout" severity error;
+      for i in 0 to RAM_DEPTH - 1 loop
+        addr <= std_logic_vector(to_unsigned(i, ADDR_WIDTH));
+        wait for CLK_PERIOD;
+        expected := std_logic_vector(to_unsigned(i * 10, DATA_WIDTH));
+        check_equal(dout, expected, "Mismatch at address " & integer'image(i));
+      end loop;
 
-    elsif RAM_MODE = "RBW" then
-      expected := (others => '0');
-      assert dout = expected
-        report "RBW: Unexpected data on dout immediately after write" severity error;
+    elsif run("overwrite and verify") then
+      addr <= std_logic_vector(to_unsigned(3, ADDR_WIDTH));
+      din  <= std_logic_vector(to_unsigned(50, DATA_WIDTH)); we <= '1'; wait for CLK_PERIOD;
+      din  <= std_logic_vector(to_unsigned(54, DATA_WIDTH)); wait for CLK_PERIOD;
+      we   <= '0'; wait for CLK_PERIOD;
+      check_equal(dout, std_logic_vector(to_unsigned(54, DATA_WIDTH)), "Overwrite failed at address 3");
 
-      wait for 10 ns;
-      expected := x"AB";
-      assert dout = expected
-        report "RBW: Read after write failed" severity error;
+    elsif run("write then read with we='0'") then
+      addr <= std_logic_vector(to_unsigned(4, ADDR_WIDTH));
+      din  <= std_logic_vector(to_unsigned(67, DATA_WIDTH)); we <= '1'; wait for CLK_PERIOD;
+      we   <= '0'; wait for CLK_PERIOD;
+      addr <= std_logic_vector(to_unsigned(4, ADDR_WIDTH)); wait for CLK_PERIOD;
+      check_equal(dout, std_logic_vector(to_unsigned(67, DATA_WIDTH)), "Data lost after WE set to 0");
+
+    elsif run("prevent write when WE=0") then
+      addr <= std_logic_vector(to_unsigned(6, ADDR_WIDTH));
+      din  <= std_logic_vector(to_unsigned(123, DATA_WIDTH));
+      we   <= '0';  -- Intentionally disabled
+      wait for CLK_PERIOD;
+      addr <= std_logic_vector(to_unsigned(6, ADDR_WIDTH));
+      wait for CLK_PERIOD;
+      check_equal(dout, std_logic_vector(to_unsigned(0, DATA_WIDTH)), "Data written even though WE=0");
+
+    elsif run("reset clears RAM (if applicable)") then
+      addr <= std_logic_vector(to_unsigned(5, ADDR_WIDTH));
+      din  <= std_logic_vector(to_unsigned(99, DATA_WIDTH)); we <= '1'; wait for CLK_PERIOD;
+      we   <= '0';
+      rst  <= '1'; wait for 2 * CLK_PERIOD; rst <= '0'; wait for CLK_PERIOD;
+      addr <= std_logic_vector(to_unsigned(5, ADDR_WIDTH)); wait for CLK_PERIOD;
+      check_equal(dout, std_logic_vector(to_unsigned(99, DATA_WIDTH)), "RAM not cleared on reset");
+
     end if;
 
-    -------------------------------------------------
-    -- Write new data to same address and verify again
-    -------------------------------------------------
-    addr <= std_logic_vector(to_unsigned(1, ADDR_WIDTH));
-    din  <= x"CD";
-    we   <= '1';
-    wait for 10 ns;
-    we   <= '0';
-    din  <= (others => '0');
-    wait for 10 ns;
-
-    if RAM_MODE = "WBR" then
-      expected := x"CD";
-      assert dout = expected
-        report "WBR: Second write not reflected immediately" severity error;
-    elsif RAM_MODE = "RBW" then
-      expected := x"AB";
-      assert dout = expected
-        report "RBW: Second write read-before incorrect" severity error;
-      wait for 10 ns;
-      expected := x"CD";
-      assert dout = expected
-        report "RBW: Second write data not available after read" severity error;
-    end if;
-
-    -------------------------------------------------
-    -- Finish simulation
-    -------------------------------------------------
-    report "Test completed successfully." severity note;
+    test_runner_cleanup(runner);
     wait;
   end process;
 

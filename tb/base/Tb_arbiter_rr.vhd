@@ -1,20 +1,12 @@
--- ============================================================================
--- Title       : Testbench for Round-Robin Arbiter
--- File        : tb_arbiter_rr.vhd
--- Author      : Rakotojaona Nambinina
--- Description : 
---   This self-checking VHDL testbench verifies the functionality of a 
---   round-robin arbiter with 4 request lines. It applies a sequence of 
---   request vectors and checks that the arbiter grants access fairly 
---   and in a rotating manner. Expected outputs are compared with actual 
---   outputs and failures are reported using assertions.
--- ============================================================================
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
+library vunit_lib;
+context vunit_lib.vunit_context;
+
 entity tb_arbiter_rr is
+  generic (runner_cfg : string);
 end tb_arbiter_rr;
 
 architecture Behavioral of tb_arbiter_rr is
@@ -29,54 +21,9 @@ architecture Behavioral of tb_arbiter_rr is
 
   constant CLK_PERIOD : time := 10 ns;
 
-  -- Helper function to convert std_logic_vector to string
-  function to_string(slv: std_logic_vector) return string is
-    variable result : string(1 to slv'length);
-  begin
-    for i in slv'range loop
-      result(i - slv'low + 1) := character'VALUE(std_ulogic'IMAGE(slv(i)));
-    end loop;
-    return result;
-  end;
-
-  -- Test vectors
-  type request_array is array (natural range <>) of std_logic_vector(REQUEST_WIDTH - 1 downto 0);
-  type grant_array   is array (natural range <>) of std_logic_vector(REQUEST_WIDTH - 1 downto 0);
-  type valid_array   is array (natural range <>) of std_logic;
-
-  constant test_requests : request_array := (
-    "0000", -- No requests
-    "1000", -- Grant 0
-    "1100", -- Grant 1
-    "0010", -- Grant 2
-    "1010", -- Grant 0 (after 2)
-    "0001", -- Grant 3
-    "0000"  -- No requests
-  );
-
-  constant expected_grants : grant_array := (
-    "0000",
-    "1000",
-    "0100",
-    "0010",
-    "1000",
-    "0001",
-    "0000"
-  );
-
-  constant expected_valids : valid_array := (
-    '0',
-    '1',
-    '1',
-    '1',
-    '1',
-    '1',
-    '0'
-  );
-
 begin
 
-  -- Instantiate DUT
+  -- Instantiate the unit under test (UUT)
   uut: entity work.arbiter_rr
     generic map (
       REQUEST_WIDTH => REQUEST_WIDTH
@@ -100,33 +47,67 @@ begin
     end loop;
   end process;
 
-  -- Stimulus process
-  stim_proc: process
+  -- Test process
+  main : process
   begin
-    -- Apply synchronous reset
+    test_runner_setup(runner, runner_cfg);
+    -- Reset
     rst <= '1';
     wait for CLK_PERIOD;
     rst <= '0';
+    wait for CLK_PERIOD;
 
-    -- Apply test vectors
-    for i in test_requests'range loop
-      request <= test_requests(i);
+    if run("test_no_requests") then
+      request <= "0000";
       wait for CLK_PERIOD;
+      check_equal(grant, 2#0000#, "Grant mismatch on no requests");
+      check_equal(valid_grant, '0', "Valid mismatch on no requests");
 
-      assert grant = expected_grants(i)
-        report "Test failed at step " & integer'image(i) &
-               ": expected grant = " & to_string(expected_grants(i)) &
-               ", got " & to_string(grant)
-        severity error;
+    elsif run("test_single_request_0") then
+      request <= "1000";
+      wait for CLK_PERIOD;
+      check_equal(grant, 2#1000#, "Grant mismatch on request 0");
+      check_equal(valid_grant, '1', "Valid mismatch on request 0");
 
-      assert valid_grant = expected_valids(i)
-        report "Test failed at step " & integer'image(i) &
-               ": expected valid_grant = " & std_ulogic'image(expected_valids(i)) &
-               ", got " & std_ulogic'image(valid_grant)
-        severity error;
-    end loop;
+    elsif run("test_single_request_1") then
+      request <= "0100";
+      wait for CLK_PERIOD;
+      check_equal(grant, 2#0100#, "Grant mismatch on request 1");
+      check_equal(valid_grant, '1', "Valid mismatch on request 1");
 
-    report "All tests passed successfully." severity note;
+    elsif run("test_multiple_requests") then
+      request <= "1100";
+      wait for CLK_PERIOD;
+      check_equal(grant, 2#0100#, "Step 1: Grant mismatch");
+      check_equal(valid_grant, '1', "Step 1: Valid mismatch");
+
+      request <= "1100";
+      wait for CLK_PERIOD;
+      check_equal(grant, 2#1000#, "Step 2: Grant mismatch");
+      check_equal(valid_grant, '1', "Step 2: Valid mismatch");
+
+      request <= "0010";
+      wait for CLK_PERIOD;
+      check_equal(grant, 2#0010#, "Step 3: Grant mismatch");
+      check_equal(valid_grant, '1', "Step 3: Valid mismatch");
+
+      request <= "1010";
+      wait for CLK_PERIOD;
+      check_equal(grant, 2#1000#, "Step 4: Grant mismatch");
+      check_equal(valid_grant, '1', "Step 4: Valid mismatch");
+
+      request <= "0001";
+      wait for CLK_PERIOD;
+      check_equal(grant, 2#0001#, "Step 5: Grant mismatch");
+      check_equal(valid_grant, '1', "Step 5: Valid mismatch");
+
+      request <= "0000";
+      wait for CLK_PERIOD;
+      check_equal(grant, 2#0000#, "Step 6: Grant mismatch");
+      check_equal(valid_grant, '0', "Step 6: Valid mismatch");
+    end if;
+
+    test_runner_cleanup(runner);
     wait;
   end process;
 

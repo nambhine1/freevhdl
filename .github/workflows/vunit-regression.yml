@@ -1,0 +1,59 @@
+name: VUnit with GHDL (LLVM backend)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  vunit-ghdl:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Setup Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.11
+
+    - name: Install build dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y git build-essential llvm-14 llvm-14-dev llvm-14-tools zlib1g-dev gnat
+
+    - name: Build and install GHDL with LLVM backend
+      run: |
+        git clone https://github.com/ghdl/ghdl.git
+        cd ghdl
+        ./configure --with-llvm-config=llvm-config-14
+        make
+        sudo make install
+        cd ..
+        ghdl --version
+
+    - name: Install VUnit
+      run: pip install vunit_hdl
+
+    - name: Run VUnit tests FIXED PRIORITY
+      run: python script/tb_arbiter_fixed_priority.py
+      
+    - name: Run VUnit tests ALU
+      run: python script/tb_ALU.py
+      
+    - name: Run VUnit tests arbitration round robin
+      run: python script/Tb_arbiter_rr.py
+      
+    - name: Run VUnit tests arbitration block run dual port 
+      run: python script/Tb_Block_Ram_dp.py
+      
+    - name: Run VUnit tests arbitration block run single port 
+      run: python script/Tb_Block_Ram_sp.py
+      
+    - name: Upload VUnit test results artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: vunit-results
+        path: vunit_out/
