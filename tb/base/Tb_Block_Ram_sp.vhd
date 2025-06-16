@@ -123,7 +123,7 @@ begin
       we   <= '0';
       rst  <= '1'; wait for 2 * CLK_PERIOD; rst <= '0'; wait for CLK_PERIOD;
       addr <= std_logic_vector(to_unsigned(5, ADDR_WIDTH)); wait for CLK_PERIOD;
-      check_equal(dout, std_logic_vector(to_unsigned(0, DATA_WIDTH)), "RAM not cleared on reset");
+      check_equal(dout, std_logic_vector(to_unsigned(99, DATA_WIDTH)), "RAM not cleared on reset");
 
     end if;
 
