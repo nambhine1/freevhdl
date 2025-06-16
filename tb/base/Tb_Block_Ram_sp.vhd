@@ -2,9 +2,14 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
+-- VUnit
+library vunit_lib;
+context vunit_lib.vunit_context;
+
 use work.math_utils.all;
 
 entity Block_Ram_tb is
+ generic (runner_cfg : string);
 end entity;
 
 architecture sim of Block_Ram_tb is
@@ -50,75 +55,24 @@ begin
   end process;
 
   -- Test process
-  stim_proc: process
+  main: process
     variable expected : std_logic_vector(DATA_WIDTH - 1 downto 0);
   begin
-    -- Reset
-    wait for 10 ns;
-    rst <= '0';
-    wait for 10 ns;
-
-    -------------------------------------------------
-    -- Write to address 1, then read from address 1
-    -------------------------------------------------
-    addr <= std_logic_vector(to_unsigned(1, ADDR_WIDTH));
-    din  <= x"AB";
-    we   <= '1';
-    wait for 10 ns;
-
-    -- In "WBR", value should appear on dout in same cycle
-    -- In "RBW", value appears in next read
-    we   <= '0';
-    din  <= (others => '0');  -- clear input
-
-    wait for 10 ns;
-
-    if RAM_MODE = "WBR" then
-      expected := x"AB";
-      assert dout = expected
-        report "WBR: Write not reflected correctly on dout" severity error;
-
-    elsif RAM_MODE = "RBW" then
-      expected := (others => '0');
-      assert dout = expected
-        report "RBW: Unexpected data on dout immediately after write" severity error;
-
-      wait for 10 ns;
-      expected := x"AB";
-      assert dout = expected
-        report "RBW: Read after write failed" severity error;
-    end if;
-
-    -------------------------------------------------
-    -- Write new data to same address and verify again
-    -------------------------------------------------
-    addr <= std_logic_vector(to_unsigned(1, ADDR_WIDTH));
-    din  <= x"CD";
-    we   <= '1';
-    wait for 10 ns;
-    we   <= '0';
-    din  <= (others => '0');
-    wait for 10 ns;
-
-    if RAM_MODE = "WBR" then
-      expected := x"CD";
-      assert dout = expected
-        report "WBR: Second write not reflected immediately" severity error;
-    elsif RAM_MODE = "RBW" then
-      expected := x"AB";
-      assert dout = expected
-        report "RBW: Second write read-before incorrect" severity error;
-      wait for 10 ns;
-      expected := x"CD";
-      assert dout = expected
-        report "RBW: Second write data not available after read" severity error;
-    end if;
-
-    -------------------------------------------------
-    -- Finish simulation
-    -------------------------------------------------
-    report "Test completed successfully." severity note;
-    wait;
-  end process;
+  
+    test_runner_setup(runner, runner_cfg);
+		if run ("read memory without write") then 
+			addr <= std_logic_vector(to_unsigned(1, ADDR_WIDTH));
+			din <= x"AB";
+			wait for 10 ns;
+			check_equal(dout, std_logic_vector(to_unsigned(0, DATA_WIDTH)), "Port A did not read expected data at addr 1.");
+		elsif run ("read memory after write value") then 
+			we <= '1';
+			addr <= std_logic_vector(to_unsigned(1, ADDR_WIDTH));
+			din <= std_logic_vector(to_unsigned(25, ADDR_WIDTH));
+			wait for 10 ns;
+			check_equal(dout, std_logic_vector(to_unsigned(25, DATA_WIDTH)), "Port A did not read expected data at addr 1.");
+		end if;
+	test_runner_cleanup(runner);
+  end process ;
 
 end architecture;
