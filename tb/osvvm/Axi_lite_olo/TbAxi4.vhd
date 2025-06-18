@@ -92,7 +92,7 @@ begin
     ManagerRec     => ManagerRec
   ) ;
   
-U_DUT : entity work.wrapper_olo_axi_lite_bram_wrapper
+U_DUT : entity work.wrapper_olo_axi_lite_slave
     generic map (
         AxiAddrWidth_g    => AXI_ADDR_WIDTH,     -- e.g., 10
         AxiDataWidth_g    => AXI_DATA_WIDTH,     -- e.g., 32

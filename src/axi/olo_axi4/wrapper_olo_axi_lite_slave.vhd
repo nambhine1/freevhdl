@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity wrapper_olo_axi_lite_bram_wrapper is
+entity wrapper_olo_axi_lite_slave is
     generic (
         AxiAddrWidth_g    : positive := 10;  -- 1024 bytes = 10 bits
         AxiDataWidth_g    : positive := 32;  -- 32 bits = 4 bytes
@@ -37,7 +37,7 @@ entity wrapper_olo_axi_lite_bram_wrapper is
     );
 end entity;
 
-architecture rtl of wrapper_olo_axi_lite_bram_wrapper is
+architecture rtl of wrapper_olo_axi_lite_slave is
 
     constant BytesPerWord_c : integer := AxiDataWidth_g / 8;
     constant AddrShift_c    : integer := 2;  -- 2^2 = 4 bytes = 32 bits per word
