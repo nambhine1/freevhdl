@@ -55,6 +55,11 @@ jobs:
       - name: Run OSVVM axi_lite_4
         run: tclsh script/regression_axi4.tcl
 
+      - name: Run OSVVM axi_lite_4_olo_library
+        run: tclsh script/regression_axi4_olo.tcl
+
+        
+
       - name: Upload simulation results (optional)
         uses: actions/upload-artifact@v4
         with:
