@@ -51,6 +51,9 @@ jobs:
 
       - name: Run OSVVM frame_gen__fifo.tcl
         run: tclsh script/regression_frame_gen.tcl
+        
+      - name: Run OSVVM axi_lite_4
+        run: tclsh script/regression_axi4.tcl
 
       - name: Upload simulation results (optional)
         uses: actions/upload-artifact@v4
