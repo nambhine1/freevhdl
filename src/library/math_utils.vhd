@@ -41,18 +41,15 @@ package body math_utils is
   end function;
 
   function ispowerof2(a : integer) return boolean is
+    variable a_uns : unsigned(31 downto 0);
+    variable aminus1_uns : unsigned(31 downto 0);
   begin
     if a < 1 then
       return false;
     else
-      return ( 
-        to_integer( 
-          unsigned( 
-            std_logic_vector( to_unsigned(a, 32) and 
-            std_logic_vector( to_unsigned(a-1, 32) )
-          ) 
-        ) = 0 
-      );
+      a_uns := to_unsigned(a, 32);
+      aminus1_uns := to_unsigned(a-1, 32);
+      return (a_uns and aminus1_uns) = to_unsigned(0, 32);
     end if;
   end function;
 end package body;
