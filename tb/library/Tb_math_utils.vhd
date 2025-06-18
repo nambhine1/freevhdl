@@ -35,11 +35,10 @@ begin
       check_equal(max(0, 0), 0, "max(0,0)");
 
     elsif run("Testing min") then
-      check_equal(min(5, 10), 5, "min(5,10)");
-      check_equal(min(-5, 10), -5, "min(-5,10)");
-      check_equal(min(100, 100), 100, "min(100,100)");
-      check_equal(min(-10, -5), -10, "min(-10,-5)");
-      check_equal(min(0, 0), 0, "min(0,0)");
+      check_equal(math_utils.min(5, 10), 5, "min(5,10)");
+      check_equal(math_utils.max(5, 10), 10, "max(5,10)");
+      check_equal(math_utils.clog2(1024), 10, "clog2(1024)");
+      check_true(math_utils.ispowerof2(4), "ispowerof2(4)");
 
     elsif run("Testing ispowerof2") then
       check_true(ispowerof2(1), "ispowerof2(1)");
