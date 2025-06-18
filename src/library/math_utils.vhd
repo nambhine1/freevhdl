@@ -7,6 +7,7 @@ package math_utils is
   function clog2(n : integer) return integer;
   function max(a, b : integer) return integer;
   function min(a, b : integer) return integer;
+  function ispowerof2(a : integer) return boolean;
 end package;
 
 package body math_utils is
@@ -36,6 +37,22 @@ package body math_utils is
       return a;
     else 
       return b;
+    end if;
+  end function;
+
+  function ispowerof2(a : integer) return boolean is
+  begin
+    if a < 1 then
+      return false;
+    else
+      return ( 
+        to_integer( 
+          unsigned( 
+            std_logic_vector( to_unsigned(a, 32) and 
+            std_logic_vector( to_unsigned(a-1, 32) )
+          ) 
+        ) = 0 
+      );
     end if;
   end function;
 end package body;
