@@ -1,8 +1,10 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
-library VUnit;
-use VUnit.TestRunner.all;
+
+library vunit_lib;
+context vunit_lib.vunit_context;
+
 use work.math_utils.all;
 
 entity tb_math_utils is
