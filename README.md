@@ -74,12 +74,6 @@ Contributions are welcome! Feel free to open issues or pull requests for:
 
 ---
 
-## License
-
-This project is licensed under the MIT License. See `LICENSE` for details.
-
----
-
 ## Authors
 
 Maintained by [Nambinina Rakotojaona](https://github.com/nambhine1).
