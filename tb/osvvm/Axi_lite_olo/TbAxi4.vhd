@@ -100,7 +100,7 @@ U_DUT : entity work.wrapper_olo_axi_lite_bram_wrapper
     )
     port map (
         Clk               => Clk,
-        Rst               => Rst,
+        Rst               => nReset,
 
         -- AXI Read Address Channel
         S_AxiLite_ArAddr  => AxiBus.ReadAddress.Addr,

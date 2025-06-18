@@ -33,15 +33,8 @@ jobs:
           cd ..
           ghdl --version
 
-      - name: Debug - Show all files
-        run: find . -type f | sort
-
-      - name: Show OSVVM script directories
-        run: |
-          ls -l src/
-          ls -l src/library/
-          ls -l src/library/OsvvmLibraries/
-          ls -l src/library/OsvvmLibraries/Scripts || echo "Scripts directory not found"
+      - name: Run OSVVM axi_lite_4_olo_library
+        run: tclsh script/regression_axi4_olo.tcl
 
       - name: Run OSVVM regression_fifo.tcl
         run: tclsh script/regression_fifo.tcl
@@ -55,10 +48,6 @@ jobs:
       - name: Run OSVVM axi_lite_4
         run: tclsh script/regression_axi4.tcl
 
-      - name: Run OSVVM axi_lite_4_olo_library
-        run: tclsh script/regression_axi4_olo.tcl
-
-        
 
       - name: Upload simulation results (optional)
         uses: actions/upload-artifact@v4
@@ -67,4 +56,4 @@ jobs:
           path: |
             **/*.ghw
             **/*.vcd
-            ./temp
+            ./
