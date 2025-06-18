@@ -52,6 +52,9 @@ jobs:
     - name: Run VUnit tests arbitration block run single port 
       run: python script/Tb_Block_Ram_sp.py
       
+    - name: Run VUnit tests math library
+      run: python script/Tb_math_utils.py
+      
     - name: Upload VUnit test results artifact
       uses: actions/upload-artifact@v4
       with:
