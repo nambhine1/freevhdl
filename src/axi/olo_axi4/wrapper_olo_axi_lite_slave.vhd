@@ -49,12 +49,12 @@ architecture rtl of wrapper_olo_axi_lite_bram_wrapper is
     signal Ram : Ram_t := (others => (others => '0'));
 
     -- Register interface
-    signal Rb_Addr    : std_logic_vector(AxiAddrWidth_g - 1 downto 0);
-    signal Rb_Wr      : std_logic;
-    signal Rb_ByteEna : std_logic_vector((AxiDataWidth_g / 8) - 1 downto 0);
-    signal Rb_WrData  : std_logic_vector(AxiDataWidth_g - 1 downto 0);
-    signal Rb_Rd      : std_logic;
-    signal Rb_RdData  : std_logic_vector(AxiDataWidth_g - 1 downto 0);
+    signal Rb_Addr    : std_logic_vector(AxiAddrWidth_g - 1 downto 0) := (others => '0');
+    signal Rb_Wr      : std_logic  := '0';
+    signal Rb_ByteEna : std_logic_vector((AxiDataWidth_g / 8) - 1 downto 0) := (others => '1');
+    signal Rb_WrData  : std_logic_vector(AxiDataWidth_g - 1 downto 0) := (others => '0');
+    signal Rb_Rd      : std_logic  := '0';
+    signal Rb_RdData  : std_logic_vector(AxiDataWidth_g - 1 downto 0) := (others => '0');
     signal Rb_RdValid : std_logic := '0';
 
 begin
