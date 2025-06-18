@@ -27,19 +27,16 @@ begin
       check_equal(clog2(32), 5, "clog2(32)");
       check_equal(clog2(1024), 10, "clog2(1024)");
 
-    elsif run("Testing max") then
-      check_equal(max(5, 10), 10, "max(5,10)");
-      check_equal(max(-5, 10), 10, "max(-5,10)");
-      check_equal(max(100, 100), 100, "max(100,100)");
-      check_equal(max(-10, -5), -5, "max(-10,-5)");
-      check_equal(max(0, 0), 0, "max(0,0)");
+    elsif run("Testing max_value") then
+      check_equal(max_value(5, 10), 10, "max_value(5,10)");
+      check_equal(max_value(-5, 10), 10, "max_value(-5,10)");
+      check_equal(max_value(100, 100), 100, "max_value(100,100)");
+      check_equal(max_value(-10, -5), -5, "max_value(-10,-5)");
+      check_equal(max_value(0, 0), 0, "max_value(0,0)");
 
     elsif run("Testing min") then
-      check_equal(math_utils.min(5, 10), 5, "min(5,10)");
-      check_equal(math_utils.max(5, 10), 10, "max(5,10)");
-      check_equal(math_utils.clog2(1024), 10, "clog2(1024)");
-      check_true(math_utils.ispowerof2(4), "ispowerof2(4)");
-
+      check_equal(min_value(5, 10), 5, "min(5,10)");
+      check_equal(min_value(8, 10), 8, "min(8,10)");
     elsif run("Testing ispowerof2") then
       check_true(ispowerof2(1), "ispowerof2(1)");
       check_true(ispowerof2(2), "ispowerof2(2)");

@@ -5,8 +5,8 @@ use IEEE.NUMERIC_STD.ALL;
 
 package math_utils is
   function clog2(n : integer) return integer;
-  function max(a, b : integer) return integer;
-  function min(a, b : integer) return integer;
+  function max_value(a, b : integer) return integer;
+  function min_value(a, b : integer) return integer;
   function ispowerof2(a : integer) return boolean;
 end package;
 
@@ -22,7 +22,7 @@ package body math_utils is
     return res;
   end function;
 
-  function max(a, b : integer) return integer is 
+  function max_value(a, b : integer) return integer is 
   begin
     if (a > b) then
       return a;
@@ -31,7 +31,7 @@ package body math_utils is
     end if;
   end function;
 
-  function min(a, b : integer) return integer is
+  function min_value(a, b : integer) return integer is
   begin
     if (a < b) then
       return a;
