@@ -1,5 +1,6 @@
 architecture BasicReadWrite of TestCtrl is
   signal TestDone : integer_barrier := 1 ;
+  signal Req_1 : AlertLogIDType;
 
 begin
   ------------------------------------------------------------
@@ -13,7 +14,9 @@ begin
     SetTranscriptMirror(TRUE);
     SetLogEnable(PASSED, FALSE);    -- Enable PASSED logs
     SetLogEnable(INFO, FALSE);      -- Enable INFO logs
-
+	
+	Req_1 <= GetReqID("PR-0001", PassedGoal => 1, ParentID => REQUIREMENT_ALERTLOG_ID);
+ 
     -- Wait for Design Reset
     wait until nReset = '1';
     ClearAlerts;
@@ -22,7 +25,9 @@ begin
     -- Wait for test to finish
     WaitForBarrier(TestDone, 5 ms);
     AlertIf(now >= 35 ms, "Test finished due to timeout");
-    AlertIf(GetAffirmCount < 1, "Test is not Self-Checking");
+    AlertIf(GetAffirmCount < 500, "Test is not Self-Checking");
+	
+	AffirmIf(Req_1, GetAlertCount = 0, GetTestName & "REQUIREMENT Req_1 FAILED!!!!!") ;
 
     wait for 1 us;
 
