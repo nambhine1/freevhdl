@@ -1,8 +1,8 @@
 architecture BasicReadWrite of TestCtrl is
-  use      osvvm.ScoreboardPkg_slv.all;
+  use    osvvm.ScoreboardPkg_slv.all;
   signal TestDone : integer_barrier := 1 ;
   signal Req_1 : AlertLogIDType;
-  signal   SB : ScoreboardIDType;
+  signal SB : ScoreboardIDType;
 
 begin
   ------------------------------------------------------------
@@ -80,7 +80,7 @@ begin
   -- AxiTransmitterProc
   --   Generate transactions for AxiTransmitter
   ------------------------------------------------------------
-	AxiTransmitterProc : process
+	/* AxiTransmitterProc : process
 		variable rv : RandomPType;
 		variable rand_data : std_logic_vector (AXI_DATA_WIDTH - 1 downto 0);
 	begin
@@ -103,12 +103,12 @@ begin
 	end process AxiTransmitterProc;
 	
 
-
+ */
   ------------------------------------------------------------
   -- AxiReceiverProc
   --   Generate transactions for AxiReceiver
   ------------------------------------------------------------
-  AxiReceiverProc : process
+/*   AxiReceiverProc : process
 	variable ExpData : std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
 	variable RcvData : std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
 	begin
@@ -127,6 +127,7 @@ begin
 	WaitForBarrier(TestDone);
 	wait;
   end process AxiReceiverProc;
+   */
 end BasicReadWrite;
 
 Configuration TbAxi4_BasicReadWrite of TbAxi4 is
