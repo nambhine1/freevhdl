@@ -73,7 +73,7 @@ begin
     WaitForBarrier(TestDone);
     wait;
   end process ManagerProc;
-end BasicReadWrite;
+
 
 
   ------------------------------------------------------------
@@ -127,7 +127,7 @@ end BasicReadWrite;
 	WaitForBarrier(TestDone);
 	wait;
   end process AxiReceiverProc;
-
+end BasicReadWrite;
 
 Configuration TbAxi4_BasicReadWrite of TbAxi4 is
   for TestHarness
