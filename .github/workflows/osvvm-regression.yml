@@ -33,6 +33,9 @@ jobs:
           cd ..
           ghdl --version
 
+      - name: Run OSVVM regression_stream_image_inv.tcl
+        run: tclsh script/regression_stream_image_inv.tcl
+
       - name: Run OSVVM regression_fifo.tcl
         run: tclsh script/regression_fifo.tcl
 
