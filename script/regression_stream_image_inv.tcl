@@ -25,6 +25,7 @@ if {$::osvvm::ToolName eq "QuestaSim"} {
 }
 
 
+build  src/library/math_utils.pro
 build src/axi/src.pro
 
 build tb/osvvm/Axi_stream_image_inv/TestHarness_image_inversion.pro
