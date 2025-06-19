@@ -82,7 +82,7 @@ begin
   ------------------------------------------------------------
 	AxiTransmitterProc : process
 		variable rv : RandomPType;
-		variable rand_data : std_logic_vector (DATA_WIDTH - 1 downto 0);
+		variable rand_data : std_logic_vector (AXI_DATA_WIDTH - 1 downto 0);
 	begin
 		wait until nReset = '1';
 		WaitForClock(StreamTxRec, 2);
@@ -92,7 +92,7 @@ begin
 		log("Send 1000 words with random values");
 	
 		for J in 0 to 999 loop  -- 1000 words
-			rand_data := rv.RandSlv(DATA_WIDTH);  -- match DATA_WIDTH
+			rand_data := rv.RandSlv(AXI_DATA_WIDTH);  -- match DATA_WIDTH
 			Push(SB, rand_data);
 			Send(StreamTxRec, rand_data);
 		end loop;
@@ -109,8 +109,8 @@ begin
   --   Generate transactions for AxiReceiver
   ------------------------------------------------------------
   AxiReceiverProc : process
-	variable ExpData : std_logic_vector(DATA_WIDTH-1 downto 0);
-	variable RcvData : std_logic_vector(DATA_WIDTH-1 downto 0);
+	variable ExpData : std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
+	variable RcvData : std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
 	begin
 	WaitForClock(StreamRxRec, 2);
 	
