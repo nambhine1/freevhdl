@@ -8,6 +8,7 @@ library osvvm ;
 
 library osvvm_Axi4 ;
   context osvvm_Axi4.Axi4LiteContext ;
+  context osvvm_AXI4.AxiStreamContext ;
 
 entity TbAxi4 is
 end entity TbAxi4 ;
