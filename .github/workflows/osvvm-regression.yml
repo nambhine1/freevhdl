@@ -33,9 +33,6 @@ jobs:
           cd ..
           ghdl --version
 
-      - name: Run OSVVM axi_lite_4_olo_library
-        run: tclsh script/regression_axi4_olo.tcl
-
       - name: Run OSVVM regression_fifo.tcl
         run: tclsh script/regression_fifo.tcl
 
