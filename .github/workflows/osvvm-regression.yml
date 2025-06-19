@@ -33,6 +33,11 @@ jobs:
           cd ..
           ghdl --version
 
+          
+
+      - name: Run OSVVM regression_axi4_stream.tcl
+        run: tclsh script/regression_axi4_stream.tcl
+
       - name: Run OSVVM regression_stream_image_inv.tcl
         run: tclsh script/regression_stream_image_inv.tcl
 
