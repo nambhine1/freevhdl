@@ -25,5 +25,6 @@ if {$::osvvm::ToolName eq "QuestaSim"} {
 }
 
 
+build  src/library/math_utils.pro
 build src/axi/src.pro
 build tb/osvvm/Axi_lite_stream/Axi4Lite.pro
