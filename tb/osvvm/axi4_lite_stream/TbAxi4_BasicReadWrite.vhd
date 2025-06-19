@@ -92,9 +92,9 @@ begin
 		log("Send 1000 words with random values");
 	
 		for J in 0 to 999 loop  -- 1000 words
-			rand_data := rv.RandSlv(AXI_DATA_WIDTH);  -- match DATA_WIDTH
-			Push(SB, J);
-			Send(StreamTxRec, J);
+			rand_data := x"00000001";  -- match DATA_WIDTH
+			Push(SB, rand_data);
+			Send(StreamTxRec, rand_data);
 		end loop;
 	
 		WaitForClock(StreamTxRec, 2);
@@ -119,7 +119,7 @@ begin
 	for J in 0 to 999 loop
 		Get(StreamRxRec, RcvData);
 		log("Data Received: " & to_hstring(RcvData), Level => DEBUG);
-		Check(SB,J);
+		Check(SB,RcvData);
 	end loop;
 	
 	WaitForClock(StreamRxRec, 2);
