@@ -94,7 +94,7 @@ begin
   
 U_DUT : entity work.wrapper_olo_axi_lite_slave
     generic map (
-        AxiAddrWidth_g    => AXI_ADDR_WIDTH,     -- e.g., 10
+        AxiAddrWidth_g    => 16,     -- e.g., 10
         AxiDataWidth_g    => AXI_DATA_WIDTH,     -- e.g., 32
         ReadTimeoutClks_g => 100                 -- or any value you prefer
     )

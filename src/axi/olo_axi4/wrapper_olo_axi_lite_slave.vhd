@@ -95,31 +95,36 @@ begin
             Rb_RdValid        => Rb_RdValid
         );
 
-    -- BRAM access process
-    p_bram : process (Clk)
-        variable WordAddr : integer;
-    begin
-        if rising_edge(Clk) then
-            -- Address conversion (manual shift by 2 = divide by 4)
-            WordAddr := to_integer(unsigned(Rb_Addr(AxiAddrWidth_g - 1 downto AddrShift_c)));
+		p_bram : process (Clk)
+			variable WordAddr : integer;
+		begin
+			if rising_edge(Clk) then
+				if Rst = '0' then
+					Rb_RdData  <= (others => '0');
+					Rb_RdValid <= '0';
+				else
+					-- Normal operation
+					WordAddr := to_integer(unsigned(Rb_Addr(AxiAddrWidth_g - 1 downto AddrShift_c)));
+		
+					-- Write
+					if Rb_Wr = '1' then
+						for i in 0 to BytesPerWord_c - 1 loop
+							if Rb_ByteEna(i) = '1' then
+								Ram(WordAddr)(8*i+7 downto 8*i) <= Rb_WrData(8*i+7 downto 8*i);
+							end if;
+						end loop;
+					end if;
+		
+					-- Read
+					if Rb_Rd = '1' then
+						Rb_RdData  <= Ram(WordAddr);
+						Rb_RdValid <= '1';
+					else
+						Rb_RdValid <= '0';
+					end if;
+				end if;
+			end if;
+		end process;
 
-            -- Write
-            if Rb_Wr = '1' then
-                for i in 0 to BytesPerWord_c - 1 loop
-                    if Rb_ByteEna(i) = '1' then
-                        Ram(WordAddr)(8*i+7 downto 8*i) <= Rb_WrData(8*i+7 downto 8*i);
-                    end if;
-                end loop;
-            end if;
-
-            -- Read
-            if Rb_Rd = '1' then
-                Rb_RdData  <= Ram(WordAddr);
-                Rb_RdValid <= '1';
-            else
-                Rb_RdValid <= '0';
-            end if;
-        end if;
-    end process;
 
 end architecture;

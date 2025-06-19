@@ -44,7 +44,7 @@ begin
     variable Data : std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
     variable data_send : std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
     variable expect_data : std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
-    variable valu : std_logic_vector(AXI_ADDR_WIDTH-1 downto 0);
+    variable valu : std_logic_vector(16-1 downto 0);
   begin
     -- Initialization
     wait until nReset = '1';
@@ -52,7 +52,7 @@ begin
 
     -- Write loop
     for int_value in 0 to 511 loop
-      valu := std_logic_vector(to_unsigned(int_value, AXI_ADDR_WIDTH));
+      valu := std_logic_vector(to_unsigned(int_value, 16));
       data_send := std_logic_vector(to_unsigned(int_value, AXI_DATA_WIDTH));
       Write(ManagerRec, valu*4, data_send);
       wait for 10 ns; -- Wait for 10 ns between values
@@ -60,7 +60,7 @@ begin
 
     -- Read loop
     for int_value in 0 to 511 loop
-      valu := std_logic_vector(to_unsigned(int_value, AXI_ADDR_WIDTH));
+      valu := std_logic_vector(to_unsigned(int_value, 16));
       expect_data := std_logic_vector(to_unsigned(int_value, AXI_DATA_WIDTH));
       Read(ManagerRec, valu*4, Data);
       AffirmIfEqual(Data, expect_data, "Manager Read Data: ");
