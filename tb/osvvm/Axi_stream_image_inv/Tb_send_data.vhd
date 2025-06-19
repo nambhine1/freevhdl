@@ -89,30 +89,40 @@ begin
   end process ControlProc;
   
   
-  ------------------------------------------------------------
-  -- AxiTransmitterProc
-  --   Generate transactions for AxiTransmitter
-  ------------------------------------------------------------
-AxiTransmitterProc : process
-    variable TxData       : std_logic_vector(DATA_WIDTH - 1 downto 0);
-    variable Prev_TxData  : std_logic_vector(DATA_WIDTH - 1 downto 0);
-    variable TxFIFO       : std_logic_vector(DATA_WIDTH - 1 downto 0);
-begin
-    wait until nReset = '1';
-    WaitForClock(StreamTxRec, 2);
-
-    log("Send 501 words with incrementing values");
-
-    TxData := (others => '0');  -- Start from 0   
-    for J in 0 to 500 loop
-      Push(SB, x"FFFFFFFF");
-      Send(StreamTxRec, TxData);
-      Prev_TxData := TxData;
-    end loop;
-    WaitForClock(StreamTxRec, 2);
-    WaitForBarrier(TestDone);
-    wait;
-end process AxiTransmitterProc;
+	------------------------------------------------------------
+	-- AxiTransmitterProc
+	--   Generate transactions for AxiTransmitter
+	------------------------------------------------------------
+	AxiTransmitterProc : process
+		variable TxData  : std_logic_vector(DATA_WIDTH - 1 downto 0);
+		variable Inv_data : std_logic_vector(DATA_WIDTH - 1 downto 0);
+		variable pixel_val : unsigned(7 downto 0);
+	begin
+		wait until nReset = '1';
+		WaitForClock(StreamTxRec, 2);
+	
+		log("Send 501 words with incrementing values");
+	
+		TxData := (others => '0');  -- Start from 0
+	
+		for J in 0 to 500 loop
+			-- Process each 8-bit lane of the 32-bit data word
+			for i in 0 to 3 loop
+				pixel_val := unsigned(TxData((i+1)*8 - 1 downto i*8));
+				Inv_data((i+1)*8 - 1 downto i*8) := std_logic_vector(to_unsigned(255 - to_integer(pixel_val), 8));
+			end loop;
+	
+			Push(SB, Inv_data);       -- Expected inverted data
+			Send(StreamTxRec, TxData); -- Send original data
+	
+			-- Optional: increment TxData (to simulate incrementing pixel pattern)
+			TxData := std_logic_vector(unsigned(TxData) + 1);
+		end loop;
+	
+		WaitForClock(StreamTxRec, 2);
+		WaitForBarrier(TestDone);
+		wait;
+	end process AxiTransmitterProc;
 
 
   ------------------------------------------------------------
