@@ -48,7 +48,7 @@ begin
 		variable RcvData : std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
 		variable add_value : std_logic_vector(AXI_ADDR_WIDTH-1 downto 0);
 		variable rv : RandomPType;
-		variable rand_data : std_logic_vector (DATA_WIDTH - 1 downto 0);
+		variable rand_data : std_logic_vector (AXI_DATA_WIDTH - 1 downto 0);
 	begin
 		-- Initialization
 		wait until nReset = '1';
