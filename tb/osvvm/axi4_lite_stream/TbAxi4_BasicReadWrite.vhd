@@ -104,7 +104,7 @@ begin
 		log("Send 1000 words with random values");
 	
 		for J in 0 to 999 loop  -- 1000 words
-			rand_data := x"00000001";  -- match DATA_WIDTH
+			rand_data := rv.RandSlv(AXI_DATA_WIDTH);  -- random data
 			Push(SB, rand_data);
 			Send(StreamTxRec, rand_data);
 		end loop;
@@ -112,10 +112,10 @@ begin
 		wait until send_inv_image = '1';
 		
 		WaitForClock(StreamTxRec, 25);
-	    TxData := (others => '0');  -- Start from 0
+	    
 	
 		for J in 0 to 500 loop
-			-- Process each 8-bit lane of the 32-bit data word
+			TxData := rv.RandSlv(AXI_DATA_WIDTH);
 			for i in 0 to 3 loop
 				pixel_val := unsigned(TxData((i+1)*8 - 1 downto i*8));
 				Inv_data((i+1)*8 - 1 downto i*8) := std_logic_vector(to_unsigned(255 - to_integer(pixel_val), 8));
@@ -123,9 +123,6 @@ begin
 	
 			Push(SB, Inv_data);       -- Expected inverted data
 			Send(StreamTxRec, TxData); -- Send original data
-	
-			-- Optional: increment TxData (to simulate incrementing pixel pattern)
-			TxData := std_logic_vector(unsigned(TxData) + 1);
 		end loop;
 	
 		WaitForClock(StreamTxRec, 2);
