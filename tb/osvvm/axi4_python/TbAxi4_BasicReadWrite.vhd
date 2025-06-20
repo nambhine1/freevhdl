@@ -53,7 +53,7 @@ begin
 		-- Initialization
 		wait until nReset = '1';
 		WaitForClock(ManagerRec, 2);
-		rv.InitSeed("AxiTransmitterProc");  -- Use string literal or integer seed
+		rv.InitSeed("AXIMANAGER_RANDOM");  -- Use string literal or integer seed
 	
 		-- Write loop
 		for int_value in 0 to 511 loop
@@ -61,7 +61,6 @@ begin
 			rand_data := rv.RandSlv(AXI_DATA_WIDTH);
 			Push(SB, rand_data);
 			Write(ManagerRec, add_value * 4, rand_data);
-			wait for 10 ns; -- Wait for 10 ns between values
 		end loop;
 	
 		-- Read loop
@@ -70,7 +69,6 @@ begin
 			Read(ManagerRec, add_value * 4, RcvData);
 			log("Data Received: " & to_hstring(RcvData), Level => DEBUG);
 			Check(SB, RcvData);
-			wait for 10 ns; -- Wait for 10 ns between values
 		end loop;
 	
 		WaitForClock(ManagerRec, 2);
@@ -78,7 +76,7 @@ begin
 		wait;
 	end process ManagerProc;
 
-
+end architecture BasicReadWrite;
 
 Configuration TbAxi4_BasicReadWrite of TbAxi4 is
   for TestHarness
