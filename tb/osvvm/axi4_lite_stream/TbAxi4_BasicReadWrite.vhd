@@ -21,6 +21,7 @@ begin
  
     -- Wait for Design Reset
     wait until nReset = '1';
+	SB <= NEWID ("Score_Board"); 
     ClearAlerts;
     LOG("Start of Transactions");
 
