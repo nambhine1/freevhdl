@@ -1,6 +1,9 @@
 architecture BasicReadWrite of TestCtrl is
+  use    osvvm.ScoreboardPkg_slv.all;
   signal TestDone : integer_barrier := 1 ;
   signal Req_1 : AlertLogIDType;
+  signal SB : ScoreboardIDType;
+
 
 begin
   ------------------------------------------------------------
@@ -19,6 +22,7 @@ begin
  
     -- Wait for Design Reset
     wait until nReset = '1';
+	SB <= NEWID ("Score_Board"); 
     ClearAlerts;
     LOG("Start of Transactions");
 
@@ -40,38 +44,40 @@ begin
   ------------------------------------------------------------
   -- ManagerProc
   ------------------------------------------------------------
-  ManagerProc : process
-    variable Data : std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
-    variable data_send : std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
-    variable expect_data : std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
-    variable valu : std_logic_vector(AXI_ADDR_WIDTH-1 downto 0);
-  begin
-    -- Initialization
-    wait until nReset = '1';
-    WaitForClock(ManagerRec, 2);
+	ManagerProc : process
+		variable RcvData : std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
+		variable add_value : std_logic_vector(AXI_ADDR_WIDTH-1 downto 0);
+		variable rv : RandomPType;
+		variable rand_data : std_logic_vector (DATA_WIDTH - 1 downto 0);
+	begin
+		-- Initialization
+		wait until nReset = '1';
+		WaitForClock(ManagerRec, 2);
+		rv.InitSeed("AxiTransmitterProc");  -- Use string literal or integer seed
+	
+		-- Write loop
+		for int_value in 0 to 511 loop
+			add_value := std_logic_vector(to_unsigned(int_value, AXI_ADDR_WIDTH));
+			rand_data := rv.RandSlv(AXI_DATA_WIDTH);
+			Push(SB, rand_data);
+			Write(ManagerRec, add_value * 4, rand_data);
+			wait for 10 ns; -- Wait for 10 ns between values
+		end loop;
+	
+		-- Read loop
+		for int_value in 0 to 511 loop
+			add_value := std_logic_vector(to_unsigned(int_value, AXI_ADDR_WIDTH));
+			Read(ManagerRec, add_value * 4, RcvData);
+			log("Data Received: " & to_hstring(RcvData), Level => DEBUG);
+			Check(SB, RcvData);
+			wait for 10 ns; -- Wait for 10 ns between values
+		end loop;
+	
+		WaitForClock(ManagerRec, 2);
+		WaitForBarrier(TestDone);
+		wait;
+	end process ManagerProc;
 
-    -- Write loop
-    for int_value in 0 to 511 loop
-      valu := std_logic_vector(to_unsigned(int_value, AXI_ADDR_WIDTH));
-      data_send := std_logic_vector(to_unsigned(int_value, AXI_DATA_WIDTH));
-      Write(ManagerRec, valu*4, data_send);
-      wait for 10 ns; -- Wait for 10 ns between values
-    end loop;
-
-    -- Read loop
-    for int_value in 0 to 511 loop
-      valu := std_logic_vector(to_unsigned(int_value, AXI_ADDR_WIDTH));
-      expect_data := std_logic_vector(to_unsigned(int_value, AXI_DATA_WIDTH));
-      Read(ManagerRec, valu*4, Data);
-      AffirmIfEqual(Data, expect_data, "Manager Read Data: ");
-      wait for 10 ns; -- Wait for 10 ns between values
-    end loop;
-
-    WaitForClock(ManagerRec, 2);
-    WaitForBarrier(TestDone);
-    wait;
-  end process ManagerProc;
-end BasicReadWrite;
 
 
 Configuration TbAxi4_BasicReadWrite of TbAxi4 is

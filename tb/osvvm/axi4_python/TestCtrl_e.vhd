@@ -49,6 +49,7 @@ library ieee ;
   
 library OSVVM ; 
   context OSVVM.OsvvmContext ; 
+   use osvvm.ScoreboardPkg_slv.all ;
 
 library osvvm_Axi4 ;
   context osvvm_Axi4.Axi4LiteContext ; 
