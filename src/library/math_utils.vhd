@@ -14,29 +14,27 @@ end package;
 
 package body math_utils is
 
-  function binarytogray (a: std_logic_vector) return std_logic_vector is 
-	variable res : std_logic_vector (a'range);
-	begin 
-		for i in 0 to a'high loop
-			if i = a'high then
-				res(i) := a(i);
-			else 
-				res(i) := a(i) xor a (i+1);
-			end if;
-		end loop;
-		return res;
-  end function;
-  
-  function graytobinary (a: std_logic_vector) return std_logic_vector is 
-	variable res : std_logic_vector (a'range);
-	begin 
-		res(a'high) := a(a'high);
-		for i in 0 to a'high -1 loop 
+	function binarytogray(a : std_logic_vector) return std_logic_vector is
+		variable res : std_logic_vector(a'range);
+		begin
+		res(a'high) := a(a'high);  -- MSB is same
+		for i in a'high-1 downto a'low loop
 			res(i) := a(i+1) xor a(i);
 		end loop;
 		return res;
-  end function;
-  
+	end function;
+	
+	function graytobinary(a : std_logic_vector) return std_logic_vector is
+		variable res : std_logic_vector(a'range);
+		begin
+		res(a'high) := a(a'high);  -- MSB is same
+		for i in a'high-1 downto a'low loop
+			res(i) := res(i+1) xor a(i);
+		end loop;
+		return res;
+	end function;
+
+ 
   function clog2(n : integer) return integer is
     variable res : integer := 0;
     variable val : integer := n - 1;
