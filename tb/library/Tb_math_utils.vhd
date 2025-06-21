@@ -21,7 +21,6 @@ architecture tb of tb_math_utils is
   signal bin_vec, gray_vec, expected_gray_vec, expected_bin_vec : std_logic_vector(31 downto 0);
 begin
   main : process
-    variable runner : runner_t;
   begin
     test_runner_setup(runner, runner_cfg);
 
@@ -64,10 +63,10 @@ begin
         bin_vec <= std_logic_vector(to_unsigned(test_vals(i), 32));
         expected_gray_vec <= std_logic_vector(to_unsigned(expected_grays(i), 32));
         wait for 0 ns;
-        gray_vec <= binary_to_gray(bin_vec);
+        gray_vec <= binarytogray(bin_vec);
         wait for 0 ns;
         check_equal(gray_vec, expected_gray_vec, "binary_to_gray failed at i=" & integer'image(i));
-        check_equal(gray_to_binary(gray_vec), bin_vec, "round-trip failed at i=" & integer'image(i));
+        check_equal(graytobinary(gray_vec), bin_vec, "round-trip failed at i=" & integer'image(i));
       end loop;
 
     elsif run("Test gray to binary") then
@@ -75,10 +74,10 @@ begin
         gray_vec <= std_logic_vector(to_unsigned(gray_vals(i), 32));
         expected_bin_vec <= std_logic_vector(to_unsigned(expected_bins(i), 32));
         wait for 0 ns;
-        bin_vec <= gray_to_binary(gray_vec);
+        bin_vec <= graytobinary(gray_vec);
         wait for 0 ns;
         check_equal(bin_vec, expected_bin_vec, "gray_to_binary failed at i=" & integer'image(i));
-        check_equal(binary_to_gray(bin_vec), gray_vec, "round-trip failed at i=" & integer'image(i));
+        check_equal(binarytogray(bin_vec), gray_vec, "round-trip failed at i=" & integer'image(i));
       end loop;
     end if;
 
