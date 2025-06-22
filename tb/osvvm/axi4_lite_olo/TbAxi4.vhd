@@ -12,7 +12,7 @@ library osvvm_Axi4 ;
 entity TbAxi4 is
 end entity TbAxi4 ;
 architecture TestHarness of TbAxi4 is
-  constant AXI_ADDR_WIDTH : integer := 32 ;
+  constant AXI_ADDR_WIDTH : integer := 8 ;
   constant AXI_DATA_WIDTH : integer := 32 ;
   constant AXI_STRB_WIDTH : integer := AXI_DATA_WIDTH/8 ;
 
