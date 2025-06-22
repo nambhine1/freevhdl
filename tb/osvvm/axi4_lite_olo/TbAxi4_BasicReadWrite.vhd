@@ -24,8 +24,8 @@ begin
 
     -- Wait for test to finish
     WaitForBarrier(TestDone, 5 ms);
-    AlertIf(now >= 35 ms, "Test finished due to timeout");
-    AlertIf(GetAffirmCount < 500, "Test is not Self-Checking");
+    AlertIf(now >= 5 ms, "Test finished due to timeout");
+    AlertIf(GetAffirmCount < 49, "Test is not Self-Checking");
 	
 	AffirmIf(Req_1, GetAlertCount = 0, GetTestName & "REQUIREMENT Req_1 FAILED!!!!!") ;
 
@@ -51,7 +51,7 @@ begin
     WaitForClock(ManagerRec, 2);
 
     -- Write loop
-    for int_value in 0 to 10 loop
+    for int_value in 0 to 50 loop
       valu := std_logic_vector(to_unsigned(int_value, AXI_ADDR_WIDTH));
       data_send := std_logic_vector(to_unsigned(int_value, AXI_DATA_WIDTH));
       Write(ManagerRec, valu*4, data_send);
@@ -59,7 +59,7 @@ begin
     end loop;
 
     -- Read loop
-    for int_value in 0 to 10 loop
+    for int_value in 0 to 50 loop
       valu := std_logic_vector(to_unsigned(int_value, AXI_ADDR_WIDTH));
       expect_data := std_logic_vector(to_unsigned(int_value, AXI_DATA_WIDTH));
       Read(ManagerRec, valu*4, Data);
