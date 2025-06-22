@@ -34,6 +34,9 @@ jobs:
           ghdl --version
 
           
+      - name: Run OSVVM regression_axi4_olo.tcl
+        run: tclsh script/regression_axi4_olo.tcl
+
       - name: Run OSVVM regression_axi4_python
         run: tclsh script/regression_axi4_python.tcl
 
