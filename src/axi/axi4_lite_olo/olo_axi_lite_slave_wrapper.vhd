@@ -12,24 +12,29 @@ entity olo_axi_lite_slave_wrapper is
         -- Clock and Reset
         Clk               : in  std_logic;
         Rst               : in  std_logic;
+
         -- AXI-Lite Interface
         -- AR channel
         S_AxiLite_ArAddr  : in  std_logic_vector(AxiAddrWidth_g - 1 downto 0);
         S_AxiLite_ArValid : in  std_logic;
         S_AxiLite_ArReady : out std_logic;
+
         -- AW channel
         S_AxiLite_AwAddr  : in  std_logic_vector(AxiAddrWidth_g - 1 downto 0);
         S_AxiLite_AwValid : in  std_logic;
         S_AxiLite_AwReady : out std_logic;
+
         -- W channel
         S_AxiLite_WData   : in  std_logic_vector(AxiDataWidth_g - 1 downto 0);
-        S_AxiLite_WStrb   : in  std_logic_vector((AxiDataWidth_g/8) - 1 downto 0);
+        S_AxiLite_WStrb   : in  std_logic_vector((AxiDataWidth_g / 8) - 1 downto 0);
         S_AxiLite_WValid  : in  std_logic;
         S_AxiLite_WReady  : out std_logic;
+
         -- B channel
         S_AxiLite_BResp   : out std_logic_vector(1 downto 0);
         S_AxiLite_BValid  : out std_logic;
         S_AxiLite_BReady  : in  std_logic;
+
         -- R channel
         S_AxiLite_RData   : out std_logic_vector(AxiDataWidth_g - 1 downto 0);
         S_AxiLite_RResp   : out std_logic_vector(1 downto 0);
@@ -40,6 +45,7 @@ end entity;
 
 architecture rtl of olo_axi_lite_slave_wrapper is
 
+    -- Register Bus signals
     signal Rb_Addr    : std_logic_vector(AxiAddrWidth_g - 1 downto 0);
     signal Rb_Wr      : std_logic;
     signal Rb_ByteEna : std_logic_vector((AxiDataWidth_g / 8) - 1 downto 0);
@@ -48,9 +54,14 @@ architecture rtl of olo_axi_lite_slave_wrapper is
     signal Rb_RdData  : std_logic_vector(AxiDataWidth_g - 1 downto 0);
     signal Rb_RdValid : std_logic;
 
+    -- Memory
+    constant MemDepth_c : integer := 251;
+    type mem_type is array (0 to MemDepth_c - 1) of std_logic_vector(AxiDataWidth_g - 1 downto 0);
+    signal mem : mem_type := (others => (others => '0'));
+
 begin
 
-    -- AXI-Lite to Register Bus
+    -- AXI-Lite Slave Instantiation
     u_axi_lite_slave : entity work.olo_axi_lite_slave
         generic map (
             AxiAddrWidth_g     => AxiAddrWidth_g,
@@ -86,29 +97,33 @@ begin
             Rb_RdValid        => Rb_RdValid
         );
 
-    -- Memory: olo_base_ram_sdp
-    inst_ram : entity work.olo_base_ram_sdp
-        generic map (
-            Depth_g         => 2 ** AxiAddrWidth_g,  -- Safe default
-            Width_g         => AxiDataWidth_g,
-            IsAsync_g       => false,
-            RdLatency_g     => 1,
-            RamStyle_g      => "auto",
-            RamBehavior_g   => "RBW",
-            UseByteEnable_g => true,  -- ? Now matches Wr_Be use
-            InitString_g    => "",
-            InitFormat_g    => "NONE"
-        )
-        port map (
-            Clk         => Clk,
-            Wr_Addr     => Rb_Addr,
-            Wr_Ena      => Rb_Wr,
-            Wr_Be       => Rb_ByteEna,
-            Wr_Data     => Rb_WrData,
-            Rd_Clk      => Clk,
-            Rd_Addr     => Rb_Addr,
-            Rd_Ena      => Rb_Rd,
-            Rd_Data     => Rb_RdData
-        );
+    -- Simple memory-mapped register handling
+    write_mem : process (Clk)
+        variable addr_v : integer;
+    begin
+        if rising_edge(Clk) then
+            addr_v := to_integer(unsigned(Rb_Addr));
+
+            -- Write operation
+            if Rb_Wr = '1' then
+                if addr_v < MemDepth_c then
+                    mem(addr_v) <= Rb_WrData;
+                end if;
+            end if;
+
+            -- Read operation
+            if Rb_Rd = '1' then
+                if addr_v < MemDepth_c then
+                    Rb_RdData <= mem(addr_v);
+                    Rb_RdValid <= '1';
+                else
+                    Rb_RdData <= (others => '0');
+                    Rb_RdValid <= '0';
+                end if;
+            else
+                Rb_RdValid <= '0';
+            end if;
+        end if;
+    end process;
 
 end architecture;
