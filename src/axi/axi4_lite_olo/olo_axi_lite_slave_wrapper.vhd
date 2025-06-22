@@ -45,6 +45,9 @@ end entity;
 
 architecture rtl of olo_axi_lite_slave_wrapper is
 
+    -- Derived constant for memory depth
+    constant MemDepth_c : integer := 2 ** AxiAddrWidth_g;
+
     -- Register Bus signals
     signal Rb_Addr    : std_logic_vector(AxiAddrWidth_g - 1 downto 0);
     signal Rb_Wr      : std_logic;
@@ -54,8 +57,7 @@ architecture rtl of olo_axi_lite_slave_wrapper is
     signal Rb_RdData  : std_logic_vector(AxiDataWidth_g - 1 downto 0);
     signal Rb_RdValid : std_logic;
 
-    -- Memory
-    constant MemDepth_c : integer := 251;
+    -- Memory declaration
     type mem_type is array (0 to MemDepth_c - 1) of std_logic_vector(AxiDataWidth_g - 1 downto 0);
     signal mem : mem_type := (others => (others => '0'));
 
@@ -97,8 +99,8 @@ begin
             Rb_RdValid        => Rb_RdValid
         );
 
-    -- Simple memory-mapped register handling
-    write_mem : process (Clk)
+    -- Register/memory read/write logic
+    process (Clk)
         variable addr_v : integer;
     begin
         if rising_edge(Clk) then
