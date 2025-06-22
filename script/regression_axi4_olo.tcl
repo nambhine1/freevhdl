@@ -24,6 +24,6 @@ if {$::osvvm::ToolName eq "QuestaSim"} {
     vmap xpm "$PrecompiledVivadoIPCores/xpm"
 }
 
-
+build src/library/math_utils.pro
 build src/axi/axi4_lite_olo/src.pro
 build tb/osvvm/axi4_lite_olo/Axi4Lite.pro

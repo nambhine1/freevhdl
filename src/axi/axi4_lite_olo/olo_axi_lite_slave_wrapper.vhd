@@ -1,6 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.math_utils.all;
 
 entity olo_axi_lite_slave_wrapper is
     generic (
@@ -45,9 +46,6 @@ end entity;
 
 architecture rtl of olo_axi_lite_slave_wrapper is
 
-    -- Derived constant for memory depth
-    constant MemDepth_c : integer := 2 ** AxiAddrWidth_g;
-
     -- Register Bus signals
     signal Rb_Addr    : std_logic_vector(AxiAddrWidth_g - 1 downto 0);
     signal Rb_Wr      : std_logic;
@@ -57,7 +55,8 @@ architecture rtl of olo_axi_lite_slave_wrapper is
     signal Rb_RdData  : std_logic_vector(AxiDataWidth_g - 1 downto 0);
     signal Rb_RdValid : std_logic;
 
-    -- Memory declaration
+    -- Memory
+    constant MemDepth_c : integer := pow2(AxiAddrWidth_g);
     type mem_type is array (0 to MemDepth_c - 1) of std_logic_vector(AxiDataWidth_g - 1 downto 0);
     signal mem : mem_type := (others => (others => '0'));
 
@@ -99,8 +98,8 @@ begin
             Rb_RdValid        => Rb_RdValid
         );
 
-    -- Register/memory read/write logic
-    process (Clk)
+    -- Simple memory-mapped register handling
+    write_mem : process (Clk)
         variable addr_v : integer;
     begin
         if rising_edge(Clk) then

@@ -10,9 +10,15 @@ package math_utils is
   function ispowerof2(a : integer) return boolean;
   function binarytogray(a : std_logic_vector) return std_logic_vector;
   function graytobinary (a : std_logic_vector) return std_logic_vector;
+  function pow2 (a : integer) return integer;
 end package;
 
 package body math_utils is
+
+   function pow2 (a : integer) return integer is 
+	  begin 
+		return 2**a;
+   end function;
 
 	function binarytogray(a : std_logic_vector) return std_logic_vector is
 		variable res : std_logic_vector(a'range);
