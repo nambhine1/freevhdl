@@ -107,6 +107,9 @@ begin
 
             -- Write operation
             if Rb_Wr = '1' then
+                -- Optional check: 
+                -- addr_v will always be within 0..MemDepth_c-1 due to address width,
+                -- but check kept for safety and future-proofing
                 if addr_v < MemDepth_c then
                     mem(addr_v) <= Rb_WrData;
                 end if;
