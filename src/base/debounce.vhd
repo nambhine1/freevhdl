@@ -1,3 +1,27 @@
+----------------------------------------------------------------------------------
+-- Company: 
+-- Engineer: 
+-- 
+-- Create Date: 25.06.2025 11:11:09
+-- Design Name: 
+-- Module Name: debounce - Behavioral
+-- Project Name: 
+-- Target Devices: 
+-- Tool Versions: 
+-- Description: Debounce circuit for mechanical button input.
+-- 
+-- Dependencies: None
+-- 
+-- Revision:
+-- Revision 0.03 - Optimized output update and counter logic
+-- Additional Comments:
+--   - Active-high reset
+--   - 2-stage synchronizer initialized to '0'
+--   - Output updates only when stable value changes
+--   - Counter range extended to prevent overflow
+-- 
+----------------------------------------------------------------------------------
+
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
@@ -15,7 +39,7 @@ end debounce;
 
 architecture Behavioral of debounce is
     signal buton_stable_s     : std_logic := '0';
-    signal counter            : integer range 0 to counter_bounce := 0;
+    signal counter            : integer range 0 to counter_bounce + 1 := 0;  -- extended range
     signal prev_buton         : std_logic := '0';
     signal synchron_data_1    : std_logic := '0';
     signal synchron_data      : std_logic := '0';
@@ -35,35 +59,31 @@ begin
         end if;
     end process;
 
-remove_noise : process(clk)
-begin
-  if rising_edge(clk) then
-    if rst = '1' then
-      counter        <= 0;
-      prev_buton     <= '0';
-      buton_stable_s <= '0';
-    else
-      if synchron_data = prev_buton then
-        if counter < counter_bounce then
-          counter <= counter + 1;
+    -- Debounce logic with optimized output update
+    remove_noise : process(clk)
+    begin
+        if rising_edge(clk) then
+            if rst = '1' then
+                counter         <= 0;
+                prev_buton      <= '0';
+                buton_stable_s  <= '0';
+            else
+                -- Detect input changes
+                if synchron_data /= prev_buton then
+                    counter    <= 0;
+                    prev_buton <= synchron_data;
+                -- Count while input is stable
+                elsif counter <= counter_bounce then
+                    counter <= counter + 1;
+                end if;
+                
+                -- Update output only when counter reaches threshold AND value changed
+                if counter = counter_bounce and buton_stable_s /= synchron_data then
+                    buton_stable_s <= synchron_data;
+                end if;
+            end if;
         end if;
-
-        -- Once the signal is stable long enough, update the output
-        if counter >= counter_bounce then
-          buton_stable_s <= synchron_data;
-        end if;
-      else
-        counter <= 0;
-      end if;
-
-      -- Always update previous value
-      prev_buton <= synchron_data;
-    end if;
-  end if;
-end process;
-
-
-
+    end process;
 
     -- Output assignment
     buton_stable <= buton_stable_s;
