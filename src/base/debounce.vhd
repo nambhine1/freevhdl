@@ -39,7 +39,7 @@ end debounce;
 
 architecture Behavioral of debounce is
     signal buton_stable_s     : std_logic := '0';
-    signal counter            : integer range 0 to counter_bounce + 1 := 0;  -- extended range
+    signal counter            : integer range 0 to counter_bounce := 0;
     signal prev_buton         : std_logic := '0';
     signal synchron_data_1    : std_logic := '0';
     signal synchron_data      : std_logic := '0';
@@ -59,31 +59,30 @@ begin
         end if;
     end process;
 
-    -- Debounce logic with optimized output update
-    remove_noise : process(clk)
-    begin
-        if rising_edge(clk) then
-            if rst = '1' then
-                counter         <= 0;
-                prev_buton      <= '0';
-                buton_stable_s  <= '0';
-            else
-                -- Detect input changes
-                if synchron_data /= prev_buton then
-                    counter    <= 0;
-                    prev_buton <= synchron_data;
-                -- Count while input is stable
-                elsif counter <= counter_bounce then
-                    counter <= counter + 1;
-                end if;
-                
-                -- Update output only when counter reaches threshold AND value changed
-                if counter = counter_bounce and buton_stable_s /= synchron_data then
-                    buton_stable_s <= synchron_data;
-                end if;
-            end if;
+remove_noise : process(clk)
+begin
+  if rising_edge(clk) then
+    if rst = '1' then
+      counter        <= 0;
+      prev_buton     <= '0';
+      buton_stable_s <= '0';
+    else
+      if synchron_data = prev_buton then
+        if counter < counter_bounce then
+          counter <= counter + 1;
         end if;
-    end process;
+      else
+        counter <= 0;
+        prev_buton <= synchron_data;  -- Update previous value immediately on change
+      end if;
+
+      -- Update output when counter reaches threshold
+      if counter = counter_bounce then
+        buton_stable_s <= synchron_data;
+      end if;
+    end if;
+  end if;
+end process;
 
     -- Output assignment
     buton_stable <= buton_stable_s;
