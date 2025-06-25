@@ -33,9 +33,15 @@ jobs:
         sudo make install
         cd ..
         ghdl --version
+        
+        
+    
 
     - name: Install VUnit
       run: pip install vunit_hdl
+      
+    - name: run vunit for debounce 
+      run: python script/Tb_debounce.py
 
     - name: Run VUnit tests FIXED PRIORITY
       run: python script/tb_arbiter_fixed_priority.py
