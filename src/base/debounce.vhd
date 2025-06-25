@@ -36,30 +36,31 @@ begin
     end process;
 
 	remove_noise : process(clk)
-	begin
-	if rising_edge(clk) then
-		if rst = '1' then
-		counter <= 0;
-		prev_buton <= '0';
-		buton_stable_s <= '0';
-		else
-		if synchron_data = prev_buton then
-			if counter < counter_bounce then
-			counter <= counter + 1;
-			end if;
-	
-			if counter = counter_bounce then
-			if buton_stable_s /= synchron_data then
-				buton_stable_s <= synchron_data;
-			end if;
-			end if;
-		else
-			counter <= 0;
-		end if;
-		prev_buton <= synchron_data;  -- update every cycle
-		end if;
-	end if;
-	end process;
+begin
+  if rising_edge(clk) then
+    if rst = '1' then
+      counter <= 0;
+      prev_buton <= '0';
+      buton_stable_s <= '0';
+    else
+      if synchron_data = prev_buton then
+        if counter < counter_bounce then
+          counter <= counter + 1;
+        end if;
+
+        if counter >= counter_bounce then
+          if buton_stable_s /= synchron_data then
+            buton_stable_s <= synchron_data;
+          end if;
+        end if;
+      else
+        counter <= 0;
+      end if;
+      prev_buton <= synchron_data;
+    end if;
+  end if;
+end process;
+
 
 
     -- Output assignment
