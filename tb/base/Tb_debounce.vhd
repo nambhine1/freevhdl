@@ -80,7 +80,7 @@ begin
 
     elsif run("stable press is accepted") then
       button <= '1';
-      wait for (counter_bounce + 5) * clk_period;
+      wait for (counter_bounce + 3) * clk_period;
       check_equal(button_stable, '1', "Stable press should set output high");
 
     elsif run("noisy release is ignored") then
