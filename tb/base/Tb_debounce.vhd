@@ -6,7 +6,7 @@ library vunit_lib;
 context vunit_lib.vunit_context;
 
 entity tb_debounce is
-  generic (runner_cfg : string := "");
+  generic (runner_cfg : string);
 end entity;
 
 architecture Behavioral of tb_debounce is
@@ -19,7 +19,6 @@ architecture Behavioral of tb_debounce is
   signal buton        : std_logic := '0';
   signal buton_stable : std_logic;
 
-  variable runner : test_runner_t;
 
 begin
 
