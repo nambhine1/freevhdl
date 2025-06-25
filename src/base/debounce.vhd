@@ -53,7 +53,7 @@ begin
                 end if;
 
                 -- Update output when counter reaches threshold
-                if counter = counter_bounce then
+                if counter = counter_bounce - 1 then
                     buton_stable_s <= prev_buton;
                 end if;
             end if;
