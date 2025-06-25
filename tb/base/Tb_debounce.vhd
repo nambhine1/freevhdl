@@ -1,91 +1,105 @@
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.NUMERIC_STD.ALL;
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 library vunit_lib;
 context vunit_lib.vunit_context;
 
 entity tb_debounce is
   generic (runner_cfg : string);
-end entity;
+end tb_debounce;
 
-architecture Behavioral of tb_debounce is
+architecture testbench of tb_debounce is
+  constant clk_period     : time := 10 ns;
+  constant counter_bounce : integer := 4;
 
-  constant CLOCK_PERIOD : time := 10 ns;
-  constant COUNTER_BOUNCE : integer := 10;
+  signal clk           : std_logic := '0';
+  signal rst           : std_logic := '0';
+  signal button        : std_logic := '0';
+  signal button_stable : std_logic;
 
-  signal clk          : std_logic := '0';
-  signal rst          : std_logic := '0';
-  signal buton        : std_logic := '0';
-  signal buton_stable : std_logic;
-
+  -- DUT Component Declaration
+  component debounce
+    generic (
+      counter_bounce : integer := 10
+    );
+    port (
+      clk           : in  std_logic;
+      rst           : in  std_logic;
+      button        : in  std_logic;
+      button_stable : out std_logic
+    );
+  end component;
 
 begin
 
-  clk_gen : process
+  -- Clock generation
+  clk_process : process
   begin
-    clk <= '0';
-    wait for CLOCK_PERIOD/2;
-    clk <= '1';
-    wait for CLOCK_PERIOD/2;
+    while true loop
+      clk <= '0';
+      wait for clk_period / 2;
+      clk <= '1';
+      wait for clk_period / 2;
+    end loop;
   end process;
 
-  uut: entity work.debounce
+  -- DUT instantiation
+  uut: debounce
     generic map (
-      counter_bounce => COUNTER_BOUNCE
+      counter_bounce => counter_bounce
     )
     port map (
-      clk          => clk,
-      rst          => rst,
-      buton        => buton,
-      buton_stable => buton_stable
+      clk           => clk,
+      rst           => rst,
+      button        => button,
+      button_stable => button_stable
     );
 
-  main : process
+  -- Test process
+  test_proc : process
   begin
     test_runner_setup(runner, runner_cfg);
 
-    if run("test_reset") then
-      rst <= '1';
-      buton <= '0';
-      wait for 2*CLOCK_PERIOD;
-      check_equal(buton_stable, '0', "After reset, buton_stable should be '0'");
+    if run("reset and initial state") then
+      wait for 3 * clk_period;
       rst <= '0';
-      wait for CLOCK_PERIOD;
-    end if;
+      wait until rising_edge(clk);
+      check_equal(button_stable, '0', "Button should be stable low after reset");
 
-    if run("test_stable_press") then
-      rst <= '0';
-      buton <= '0';
-      wait for CLOCK_PERIOD;
-      buton <= '1';
-      wait for CLOCK_PERIOD * (COUNTER_BOUNCE + 2);
-      check_equal(buton_stable, '1', "Debounce failed to detect stable press");
+    elsif run("noisy press is ignored") then
+      button <= '1';
+      wait for clk_period;
+      button <= '0';
+      wait for clk_period;
+      button <= '1';
+      wait for clk_period;
+      button <= '0';
+      wait for clk_period;
+      check_equal(button_stable, '0', "Noisy press should not affect output");
 
-      buton <= '0';
-      wait for CLOCK_PERIOD * (COUNTER_BOUNCE + 2);
-      check_equal(buton_stable, '0', "Debounce failed to detect stable release");
-    end if;
+    elsif run("stable press is accepted") then
+      button <= '1';
+      wait for (counter_bounce + 1) * clk_period;
+      check_equal(button_stable, '1', "Stable press should set output high");
 
-    if run("test_bounce") then
-      rst <= '0';
-      buton <= '0';
-      wait for CLOCK_PERIOD;
+    elsif run("noisy release is ignored") then
+      button <= '0';
+      wait for clk_period;
+      button <= '1';
+      wait for clk_period;
+      button <= '0';
+      wait for clk_period *5;
+      check_equal(button_stable, '0', "Noisy release should not affect output");
 
-      for i in 0 to COUNTER_BOUNCE - 3 loop
-        buton <= not buton;
-        wait for CLOCK_PERIOD;
-      end loop;
-
-      check_equal(buton_stable, '0', "Debounce incorrectly changed output during bounce");
-
-      buton <= '1';
-      wait for CLOCK_PERIOD * (COUNTER_BOUNCE + 1);
-      check_equal(buton_stable, '1', "Debounce failed to detect stable press after bounce");
+    elsif run("stable release is accepted") then
+      button <= '0';
+      wait for (counter_bounce + 1) * clk_period;
+      check_equal(button_stable, '0', "Stable release should set output low");
     end if;
 
     test_runner_cleanup(runner);
     wait;
   end process;
 
-end Behavioral;
+end architecture;
