@@ -33,37 +33,89 @@ jobs:
           cd ..
           ghdl --version
 
-      # Regression tests with failure handling
+      # Regression tests with precise failure handling
+      
+      
+      - name: Run OSVVM axi_lite_4
+        run: |
+          set -e
+          tclsh script/regression_axi4.tcl 2>&1 | tee regression_axi4.log
+          if grep -q -e "FAILED" -e "FAILURE" -e "ERROR" regression_axi4.log; then
+            echo "❌ Test failed: regression_axi4.tcl"
+            exit 1
+          fi
+          
       - name: Run OSVVM regression_axi4_olo.tcl
-        run: tclsh script/regression_axi4_olo.tcl || exit 1
+        run: |
+          set -e
+          tclsh script/regression_axi4_olo.tcl 2>&1 | tee regression_axi4_olo.log
+          if grep -q -e "FAILED" -e "FAILURE" -e "ERROR" regression_axi4_olo.log; then
+            echo "❌ Test failed: regression_axi4_olo.tcl"
+            exit 1
+          fi
 
       - name: Run OSVVM regression_axi4_python
-        run: tclsh script/regression_axi4_python.tcl || exit 1
+        run: |
+          set -e
+          tclsh script/regression_axi4_python.tcl 2>&1 | tee regression_axi4_python.log
+          if grep -q -e "FAILED" -e "FAILURE" -e "ERROR" regression_axi4_python.log; then
+            echo "❌ Test failed: regression_axi4_python.tcl"
+            exit 1
+          fi
 
       - name: Run OSVVM regression_axi4_stream.tcl
-        run: tclsh script/regression_axi4_stream.tcl || exit 1
+        run: |
+          set -e
+          tclsh script/regression_axi4_stream.tcl 2>&1 | tee regression_axi4_stream.log
+          if grep -q -e "FAILED" -e "FAILURE" -e "ERROR" regression_axi4_stream.log; then
+            echo "❌ Test failed: regression_axi4_stream.tcl"
+            exit 1
+          fi
 
       - name: Run OSVVM regression_stream_image_inv.tcl
-        run: tclsh script/regression_stream_image_inv.tcl || exit 1
+        run: |
+          set -e
+          tclsh script/regression_stream_image_inv.tcl 2>&1 | tee regression_stream_image_inv.log
+          if grep -q -e "FAILED" -e "FAILURE" -e "ERROR" regression_stream_image_inv.log; then
+            echo "❌ Test failed: regression_stream_image_inv.tcl"
+            exit 1
+          fi
 
       - name: Run OSVVM regression_fifo.tcl
-        run: tclsh script/regression_fifo.tcl || exit 1
+        run: |
+          set -e
+          tclsh script/regression_fifo.tcl 2>&1 | tee regression_fifo.log
+          if grep -q -e "FAILED" -e "FAILURE" -e "ERROR" regression_fifo.log; then
+            echo "❌ Test failed: regression_fifo.tcl"
+            exit 1
+          fi
 
       - name: Run OSVVM regression_stream_delta.tcl
-        run: tclsh script/regression_stream_delta.tcl || exit 1
+        run: |
+          set -e
+          tclsh script/regression_stream_delta.tcl 2>&1 | tee regression_stream_delta.log
+          if grep -q -e "FAILED" -e "FAILURE" -e "ERROR" regression_stream_delta.log; then
+            echo "❌ Test failed: regression_stream_delta.tcl"
+            exit 1
+          fi
 
       - name: Run OSVVM frame_gen__fifo.tcl
-        run: tclsh script/regression_frame_gen.tcl || exit 1
-        
-      - name: Run OSVVM axi_lite_4
-        run: tclsh script/regression_axi4.tcl || exit 1
+        run: |
+          set -e
+          tclsh script/regression_frame_gen.tcl 2>&1 | tee regression_frame_gen.log
+          if grep -q -e "FAILED" -e "FAILURE" -e "ERROR" regression_frame_gen.log; then
+            echo "❌ Test failed: regression_frame_gen.tcl"
+            exit 1
+          fi
 
-      - name: Upload simulation results (optional)
-        if: success()  # Only upload if all previous steps succeeded
+
+      - name: Upload simulation results and logs
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: simulation-results
           path: |
             **/*.ghw
             **/*.vcd
+            ./*.log
             ./
