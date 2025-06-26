@@ -21,6 +21,7 @@ architecture TestHarness of TbAxi4 is
 
   signal Clk         : std_logic ;
   signal nReset      : std_logic ;
+  signal NotnReset : std_logic;
 
   signal ManagerRec  : AddressBusRecType(
           Address(AXI_ADDR_WIDTH-1 downto 0),
@@ -50,6 +51,8 @@ architecture TestHarness of TbAxi4 is
 
 
 begin
+
+  NotnReset <= nReset;
 
   -- create Clock
   Osvvm.ClockResetPkg.CreateClock (
@@ -100,7 +103,7 @@ DUT : entity work.axi_lite_ram_wrapper
     port map (
         -- AXI Clock and Reset
         s00_axi_aclk    => Clk,
-        s00_axi_aresetn => nReset,
+        s00_axi_aresetn => NotnReset,
 
         -- AXI Write Address Channel
         s00_axi_awaddr  => AxiBus.WriteAddress.Addr,

@@ -646,7 +646,7 @@ begin
 	process (S_AXI_ACLK)
 	begin
 	  if rising_edge(S_AXI_ACLK) then 
-	    if S_AXI_ARESETN = '0' then
+	    if S_AXI_ARESETN = '1' then
 	      axi_awready <= '0';
 	      aw_en <= '1';
 	    else
@@ -674,7 +674,7 @@ begin
 	process (S_AXI_ACLK)
 	begin
 	  if rising_edge(S_AXI_ACLK) then 
-	    if S_AXI_ARESETN = '0' then
+	    if S_AXI_ARESETN = '1' then
 	      axi_awaddr <= (others => '0');
 	    else
 	      if (axi_awready = '0' and S_AXI_AWVALID = '1' and S_AXI_WVALID = '1' and aw_en = '1') then
@@ -693,7 +693,7 @@ begin
 	process (S_AXI_ACLK)
 	begin
 	  if rising_edge(S_AXI_ACLK) then 
-	    if S_AXI_ARESETN = '0' then
+	    if S_AXI_ARESETN = '1' then
 	      axi_wready <= '0';
 	    else
 	      if (axi_wready = '0' and S_AXI_WVALID = '1' and S_AXI_AWVALID = '1' and aw_en = '1') then
@@ -722,7 +722,7 @@ begin
 	variable loc_addr :std_logic_vector(OPT_MEM_ADDR_BITS downto 0); 
 	begin
 	  if rising_edge(S_AXI_ACLK) then 
-	    if S_AXI_ARESETN = '0' then
+	    if S_AXI_ARESETN = '1' then
 	      slv_reg0 <= (others => '0');
 	      slv_reg1 <= (others => '0');
 	      slv_reg2 <= (others => '0');
@@ -5863,7 +5863,7 @@ begin
 	process (S_AXI_ACLK)
 	begin
 	  if rising_edge(S_AXI_ACLK) then 
-	    if S_AXI_ARESETN = '0' then
+	    if S_AXI_ARESETN = '1' then
 	      axi_bvalid  <= '0';
 	      axi_bresp   <= "00"; --need to work more on the responses
 	    else
@@ -5887,7 +5887,7 @@ begin
 	process (S_AXI_ACLK)
 	begin
 	  if rising_edge(S_AXI_ACLK) then 
-	    if S_AXI_ARESETN = '0' then
+	    if S_AXI_ARESETN = '1' then
 	      axi_arready <= '0';
 	      axi_araddr  <= (others => '1');
 	    else
@@ -5914,7 +5914,7 @@ begin
 	process (S_AXI_ACLK)
 	begin
 	  if rising_edge(S_AXI_ACLK) then
-	    if S_AXI_ARESETN = '0' then
+	    if S_AXI_ARESETN = '1' then
 	      axi_rvalid <= '0';
 	      axi_rresp  <= "00";
 	    else
@@ -6974,7 +6974,7 @@ begin
 	process( S_AXI_ACLK ) is
 	begin
 	  if (rising_edge (S_AXI_ACLK)) then
-	    if ( S_AXI_ARESETN = '0' ) then
+	    if ( S_AXI_ARESETN = '1' ) then
 	      axi_rdata  <= (others => '0');
 	    else
 	      if (slv_reg_rden = '1') then
