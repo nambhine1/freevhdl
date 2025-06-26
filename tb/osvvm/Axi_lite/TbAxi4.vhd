@@ -52,7 +52,6 @@ architecture TestHarness of TbAxi4 is
 
 begin
 
-  NotnReset <= nReset;
 
   -- create Clock
   Osvvm.ClockResetPkg.CreateClock (
@@ -103,7 +102,7 @@ DUT : entity work.axi_lite_ram_wrapper
     port map (
         -- AXI Clock and Reset
         s00_axi_aclk    => Clk,
-        s00_axi_aresetn => NotnReset,
+        s00_axi_aresetn =>  not nReset,
 
         -- AXI Write Address Channel
         s00_axi_awaddr  => AxiBus.WriteAddress.Addr,
