@@ -102,7 +102,7 @@ DUT : entity work.axi_lite_ram_wrapper
     port map (
         -- AXI Clock and Reset
         s00_axi_aclk    => Clk,
-        s00_axi_aresetn => nReset,
+        s00_axi_aresetn => not nReset,
 
         -- AXI Write Address Channel
         s00_axi_awaddr  => AxiBus.WriteAddress.Addr,
