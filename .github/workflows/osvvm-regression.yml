@@ -33,33 +33,33 @@ jobs:
           cd ..
           ghdl --version
 
-          
+      # Regression tests with failure handling
       - name: Run OSVVM regression_axi4_olo.tcl
-        run: tclsh script/regression_axi4_olo.tcl
+        run: tclsh script/regression_axi4_olo.tcl || exit 1
 
       - name: Run OSVVM regression_axi4_python
-        run: tclsh script/regression_axi4_python.tcl
+        run: tclsh script/regression_axi4_python.tcl || exit 1
 
       - name: Run OSVVM regression_axi4_stream.tcl
-        run: tclsh script/regression_axi4_stream.tcl
+        run: tclsh script/regression_axi4_stream.tcl || exit 1
 
       - name: Run OSVVM regression_stream_image_inv.tcl
-        run: tclsh script/regression_stream_image_inv.tcl
+        run: tclsh script/regression_stream_image_inv.tcl || exit 1
 
       - name: Run OSVVM regression_fifo.tcl
-        run: tclsh script/regression_fifo.tcl
+        run: tclsh script/regression_fifo.tcl || exit 1
 
       - name: Run OSVVM regression_stream_delta.tcl
-        run: tclsh script/regression_stream_delta.tcl
+        run: tclsh script/regression_stream_delta.tcl || exit 1
 
       - name: Run OSVVM frame_gen__fifo.tcl
-        run: tclsh script/regression_frame_gen.tcl
+        run: tclsh script/regression_frame_gen.tcl || exit 1
         
       - name: Run OSVVM axi_lite_4
-        run: tclsh script/regression_axi4.tcl
-
+        run: tclsh script/regression_axi4.tcl || exit 1
 
       - name: Upload simulation results (optional)
+        if: success()  # Only upload if all previous steps succeeded
         uses: actions/upload-artifact@v4
         with:
           name: simulation-results
