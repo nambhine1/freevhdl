@@ -34,11 +34,12 @@ jobs:
         cd ..
         ghdl --version
         
-        
-    
 
     - name: Install VUnit
       run: pip install vunit_hdl
+      
+    - name: run vunit for decode first bit
+      run : python script/Tb_decode_first_bit.py
       
     - name: run vunit for debounce 
       run: python script/Tb_debounce.py
