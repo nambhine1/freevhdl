@@ -12,7 +12,7 @@ end entity;
 architecture Behavioral of tb_decode_first_bit is
 
   constant DATA_WIDTH_g : positive := 32;
-  constant OUT_WIDTH : integer := integer(ceil(log2(real(DATA_WIDTH_g))));
+  constant OUT_WIDTH : integer := clog2(DATA_WIDTH_g);
 
   -- DUT signals
   signal clk       : std_logic := '0';
