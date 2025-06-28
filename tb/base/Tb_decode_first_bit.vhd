@@ -1,6 +1,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
+use work.math_utils.all;
 
 library vunit_lib;
 context vunit_lib.vunit_context;
