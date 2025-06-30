@@ -36,7 +36,7 @@ begin
 
   -- Assert that SYNC_MODE_g is valid at elaboration time
   assert (SYNC_MODE_g = "SYNC") or (SYNC_MODE_g = "ASYNC")
-    report "SYNC_MODE_g must be either \"SYNC\" or \"ASYNC\""
+    report "SYNC_MODE_g must be either SYNC or ASYNC"
     severity error;
 
   -- Split the concatenated input vector into the array
