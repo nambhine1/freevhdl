@@ -39,7 +39,7 @@ jobs:
       run: pip install vunit_hdl
       
     - name: run vunit for mux 
-      run python script/Tb_mux.py
+      run: python script/Tb_mux.py
       
     - name: run vunit for decode first bit
       run : python script/Tb_decode_first_bit.py
