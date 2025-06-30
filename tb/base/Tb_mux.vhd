@@ -6,8 +6,6 @@ use work.math_utils.all;
 library vunit_lib;
 context vunit_lib.vunit_context;
 
-use work.math_utils.all;
-
 entity tb_mux is
   generic (
     runner_cfg : string
@@ -27,6 +25,12 @@ architecture Behavioral of tb_mux is
   signal out_data  : std_logic_vector(DATA_WIDTH - 1 downto 0);
 
   constant CLK_PERIOD : time := 10 ns;
+
+  -- Input values as integers (decimal equivalent of hex)
+  constant INPUT0_INT : integer := 17; -- 0x11
+  constant INPUT1_INT : integer := 34; -- 0x22
+  constant INPUT2_INT : integer := 51; -- 0x33
+  constant INPUT3_INT : integer := 68; -- 0x44
 
 begin
 
@@ -61,11 +65,11 @@ begin
   begin
     test_runner_setup(runner, runner_cfg);
 
-    -- Initialize inputs
-    in_data(7 downto 0)     <= x"11"; -- Input 0
-    in_data(15 downto 8)    <= x"22"; -- Input 1
-    in_data(23 downto 16)   <= x"33"; -- Input 2
-    in_data(31 downto 24)   <= x"44"; -- Input 3
+    -- Initialize inputs using integer constants converted to std_logic_vector
+    in_data(7 downto 0)     <= std_logic_vector(to_unsigned(INPUT0_INT, DATA_WIDTH)); -- Input 0
+    in_data(15 downto 8)    <= std_logic_vector(to_unsigned(INPUT1_INT, DATA_WIDTH)); -- Input 1
+    in_data(23 downto 16)   <= std_logic_vector(to_unsigned(INPUT2_INT, DATA_WIDTH)); -- Input 2
+    in_data(31 downto 24)   <= std_logic_vector(to_unsigned(INPUT3_INT, DATA_WIDTH)); -- Input 3
 
     -- Reset the design
     rst <= '1';
@@ -76,22 +80,22 @@ begin
     if run("test_select_input_0") then
       sel <= std_logic_vector(to_unsigned(0, SEL_WIDTH));
       wait for CLK_PERIOD;
-      check_equal(out_data, x"11", "MUX output mismatch for input 0");
+      check_equal(out_data, std_logic_vector(to_unsigned(INPUT0_INT, DATA_WIDTH)), "MUX output mismatch for input 0");
 
     elsif run("test_select_input_1") then
       sel <= std_logic_vector(to_unsigned(1, SEL_WIDTH));
       wait for CLK_PERIOD;
-      check_equal(out_data, x"22", "MUX output mismatch for input 1");
+      check_equal(out_data, std_logic_vector(to_unsigned(INPUT1_INT, DATA_WIDTH)), "MUX output mismatch for input 1");
 
     elsif run("test_select_input_2") then
       sel <= std_logic_vector(to_unsigned(2, SEL_WIDTH));
       wait for CLK_PERIOD;
-      check_equal(out_data, x"33", "MUX output mismatch for input 2");
+      check_equal(out_data, std_logic_vector(to_unsigned(INPUT2_INT, DATA_WIDTH)), "MUX output mismatch for input 2");
 
     elsif run("test_select_input_3") then
       sel <= std_logic_vector(to_unsigned(3, SEL_WIDTH));
       wait for CLK_PERIOD;
-      check_equal(out_data, x"44", "MUX output mismatch for input 3");
+      check_equal(out_data, std_logic_vector(to_unsigned(INPUT3_INT, DATA_WIDTH)), "MUX output mismatch for input 3");
 
     end if;
 
