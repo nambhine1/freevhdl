@@ -14,6 +14,7 @@ architecture Behavioral of tb_decode_first_bit is
 
   constant DATA_WIDTH_g : positive := 32;
   constant OUT_WIDTH : integer := clog2(DATA_WIDTH_g);
+  constant SPLIT_DATA_g : integer := 2;
 
   -- DUT signals
   signal clk       : std_logic := '0';
@@ -33,7 +34,8 @@ begin
 
   uut: entity work.decode_first_bit
     generic map (
-      DATA_WIDTH_g => DATA_WIDTH_g
+      DATA_WIDTH_g => DATA_WIDTH_g,
+	  SPLIT_DATA_g => SPLIT_DATA_g
     )
     port map (
       clk       => clk,
@@ -44,7 +46,7 @@ begin
       out_data  => out_data,
       out_found => out_found
     );
-
+	
   -- Clock generation
   clk_process : process
   begin
