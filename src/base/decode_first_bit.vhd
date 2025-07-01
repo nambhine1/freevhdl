@@ -42,6 +42,12 @@ architecture Behavioral of decode_first_bit is
 
 begin
 
+
+  assert (DATA_WIDTH_g mod SPLIT_DATA_g = 0)
+    report "DATA_WIDTH_g must be divisible by SPLIT_DATA_g"
+    severity failure;
+
+
   -- Output assignments
   out_data  <= out_data_s;
   out_valid <= out_valid_s;
