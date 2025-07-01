@@ -14,7 +14,7 @@ architecture Behavioral of tb_decode_first_bit is
 
   constant DATA_WIDTH_g : positive := 32;
   constant OUT_WIDTH : integer := clog2(DATA_WIDTH_g);
-  constant SPLIT_DATA_g : integer := 2;
+  constant SPLIT_DATA_g : integer := 4;
 
   -- DUT signals
   signal clk       : std_logic := '0';
