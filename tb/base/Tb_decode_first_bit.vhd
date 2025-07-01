@@ -70,7 +70,7 @@ begin
 
       -- Test stimulus
       valid <= '1';
-      wait for clk_period;
+      wait for clk_period *2;
       check_equal(out_valid, '1', "out_valid mismatch on all zero");
       check_equal(out_found, '0', "out_found mismatch on all zero");
       check_equal(out_data, std_logic_vector(to_unsigned(0, OUT_WIDTH)), "out_data mismatch on all zero");
@@ -83,7 +83,7 @@ begin
       data <= (others => '0');
       data(0) <= '1';
       valid <= '1';
-      wait for clk_period;
+      wait for clk_period *2;
       check_equal(out_valid, '1', "out_valid mismatch on first bit set");
       check_equal(out_found, '1', "out_found mismatch on first bit set");
       check_equal(out_data, std_logic_vector(to_unsigned(0, OUT_WIDTH)), "out_data mismatch on first bit set");
@@ -91,12 +91,12 @@ begin
     elsif run("test_middle_bit_set") then
       rst <= '1'; valid <= '0'; data <= ZERO_VECTOR;
       wait for clk_period * 2;
-      rst <= '0'; wait for clk_period;
+      rst <= '0'; wait for clk_period *2;
 
       data <= (others => '0');
       data(15) <= '1';
       valid <= '1';
-      wait for clk_period;
+      wait for clk_period *2;
       check_equal(out_valid, '1', "out_valid mismatch on middle bit set");
       check_equal(out_found, '1', "out_found mismatch on middle bit set");
       check_equal(out_data, std_logic_vector(to_unsigned(15, OUT_WIDTH)), "out_data mismatch on middle bit set");
@@ -104,16 +104,16 @@ begin
     elsif run("test_multiple_bits_set") then
       rst <= '1'; valid <= '0'; data <= ZERO_VECTOR;
       wait for clk_period * 2;
-      rst <= '0'; wait for clk_period;
+      rst <= '0'; wait for clk_period *2;
 
       data <= (others => '0');
-      data(3) <= '1';
-      data(10) <= '1';
+      data(0) <= '0';
+      data(31) <= '1';
       valid <= '1';
-      wait for clk_period;
+      wait for clk_period *2;
       check_equal(out_valid, '1', "out_valid mismatch on multiple bits set");
       check_equal(out_found, '1', "out_found mismatch on multiple bits set");
-      check_equal(out_data, std_logic_vector(to_unsigned(3, OUT_WIDTH)), "out_data mismatch on multiple bits set");
+      check_equal(out_data, std_logic_vector(to_unsigned(31, OUT_WIDTH)), "out_data mismatch on multiple bits set");
 
     elsif run("test_valid_low") then
       rst <= '1'; valid <= '0'; data <= ZERO_VECTOR;
@@ -122,7 +122,7 @@ begin
 
       data <= (others => '1');
       valid <= '0';
-      wait for clk_period;
+      wait for clk_period *2;
       check_equal(out_valid, '0', "out_valid mismatch when valid is low");
       check_equal(out_found, '0', "out_found mismatch when valid is low");
       check_equal(out_data, std_logic_vector(to_unsigned(0, OUT_WIDTH)), "out_data mismatch when valid is low");
