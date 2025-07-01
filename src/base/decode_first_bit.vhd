@@ -53,13 +53,10 @@ begin
   out_valid <= out_valid_s;
   out_found <= out_found_s;
 
-  -- Input splitting
-  split_data : process(data)
-  begin
-    for i in 0 to SPLIT_DATA_g - 1 loop
+    -- Input splitting
+    gen_split_data : for i in 0 to SPLIT_DATA_g - 1 generate
       in_data_array(i) <= data(((i + 1) * DATA_WIDTH_SPLIT_c) - 1 downto i * DATA_WIDTH_SPLIT_c);
-    end loop;
-  end process;
+    end generate gen_split_data;
 
   -- Parallel decoding of each split
   decode_process : for i in 0 to SPLIT_DATA_g - 1 generate
