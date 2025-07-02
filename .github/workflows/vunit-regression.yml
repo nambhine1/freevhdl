@@ -38,6 +38,9 @@ jobs:
     - name: Install VUnit
       run: pip install vunit_hdl
       
+    - name: run vunit for min value 
+      run: python script/Tb_min_value.py
+      
     - name: run vunit for mux 
       run: python script/Tb_mux.py
       
