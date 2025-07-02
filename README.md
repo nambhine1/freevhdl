@@ -74,6 +74,12 @@ Contributions are welcome! Feel free to open issues or pull requests for:
 
 ---
 
+## License
+
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).  
+See the [LICENSE](./LICENSE) file for full license text.
+
+
 ## Authors
 
 Maintained by [Nambinina Rakotojaona](https://github.com/nambhine1).
