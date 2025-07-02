@@ -34,7 +34,9 @@ begin
     generic map (
       DATA_WIDTH_g      => DATA_WIDTH_g,
       NUMBER_IN_DATA_g  => NUMBER_IN_DATA_g,
-      SPLIT_DATA_NUM_g  => SPLIT_DATA_NUM_g
+      SPLIT_DATA_NUM_g  => SPLIT_DATA_NUM_g,
+	  PIPELINE_MODE 	=> "ACTIVE" -- NOT_ACTIVE; ACTIVE
+
     )
     port map (
       clk      => clk,

@@ -6,7 +6,8 @@ entity min_value is
     generic (
         DATA_WIDTH_g       : positive := 32;
         NUMBER_IN_DATA_g   : positive := 32;
-        SPLIT_DATA_NUM_g   : positive := 2
+        SPLIT_DATA_NUM_g   : positive := 2;
+        PIPELINE_MODE : string := "NOT_ACTIVE" -- , NOT_ACTIVE; ACTIVE
     );
     port (
         clk       : in std_logic; 
@@ -35,12 +36,16 @@ begin
     assert (NUMBER_IN_DATA_g mod SPLIT_DATA_NUM_g = 0)
         report "NUMBER_IN_DATA_g must be divisible by SPLIT_DATA_NUM_g"
         severity failure;
+    -- check mode of pipeline
+    assert PIPELINE_MODE = "ACTIVE" or PIPELINE_MODE = "NOT_ACTIVE"
+        report "PIPELINE MODE must be only active or not active"
+        severity failure;
 
+   pipeline_mode_active : if PIPELINE_MODE = "ACTIVE" generate
     -- Split input data
     split_data_gen : for i in 0 to SPLIT_DATA_NUM_g -1 generate
         current_data_array(i) <= data(((i+1) * split_data_c * DATA_WIDTH_g -1) downto (i * split_data_c * DATA_WIDTH_g));
     end generate;
-
     -- Filter minimum per segment
     filter_min : for i in 0 to SPLIT_DATA_NUM_g -1 generate
         filter_min_proc : process(clk)
@@ -54,7 +59,7 @@ begin
                     temp := unsigned(current_data_array(i)(DATA_WIDTH_g -1 downto 0));
                     for j in 1 to split_data_c - 1 loop
                         word := unsigned(current_data_array(i)((DATA_WIDTH_g*(j+1))-1 downto (DATA_WIDTH_g*j)));
-                        if word < temp then
+                        if word <= temp then
                             temp := word;
                         end if;
                     end loop;
@@ -75,7 +80,7 @@ begin
             else
                 temp_min := unsigned(out_min_array(0));
                 for i in 1 to SPLIT_DATA_NUM_g -1 loop
-                    if unsigned(out_min_array(i)) < temp_min then
+                    if unsigned(out_min_array(i)) <= temp_min then
                         temp_min := unsigned(out_min_array(i));
                     end if;
                 end loop;
@@ -83,6 +88,32 @@ begin
             end if;
         end if;
     end process;
+   end generate pipeline_mode_active;
+   
+   pipeline_mode_not_active : if PIPELINE_MODE = "NOT_ACTIVE" generate
+      min_value_proc : process (clk) 
+        variable temp : unsigned (DATA_WIDTH_g -1 downto 0);
+        variable word : unsigned (DATA_WIDTH_g -1 downto 0);
+        begin
+            if rising_edge (clk) then
+                if rst = '1' then
+                    min_data_s <= (others => '0');
+                    temp := (others => '0');
+                    word := (others => '0');
+                else
+                    temp := unsigned(data(DATA_WIDTH_g -1 downto 0));
+                    for i in 1 to NUMBER_IN_DATA_g -1 loop
+                        word := unsigned (data( ((i +1)* DATA_WIDTH_g) -1 downto i* DATA_WIDTH_g ));
+                        if (word <= temp) then
+                            temp := word;
+                        end if;
+                    end loop;
+                    
+                    min_data_s <= std_logic_vector(temp);
+                end if;
+            end if;
+        end process;
+   end generate pipeline_mode_not_active;
 
     min_data <= min_data_s;
 
