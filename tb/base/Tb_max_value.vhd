@@ -88,7 +88,7 @@ begin
 
     elsif run("test_case_2") then
       input_array := (100, 250, 80, 65, 90, 70, 30, 55); -- min = 30
-      expected_max := 100;
+      expected_max := 250;
 
       for i in 0 to NUMBER_IN_DATA_g - 1 loop
         packed_data((i+1)*DATA_WIDTH_g - 1 downto i*DATA_WIDTH_g) :=
