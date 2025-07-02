@@ -1,5 +1,9 @@
-
 # FreeVHDL
+
+[![Workflow Status](https://github.com/FPGA-Mada/freevhdl/actions/workflows/your-workflow.yml/badge.svg)](https://github.com/FPGA-Mada/freevhdl/actions)
+
+Official GitHub Repository: [https://github.com/FPGA-Mada/freevhdl](https://github.com/FPGA-Mada/freevhdl)
+
 
 **FreeVHDL** is a collection of reusable, open-source VHDL code snippets and modules designed to support hardware design, learning, and rapid prototyping. This repository aims to be a comprehensive resource for students, engineers, and enthusiasts working with FPGA and ASIC designs.
 
