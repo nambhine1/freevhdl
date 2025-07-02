@@ -1,8 +1,6 @@
 # FreeVHDL
 
-[Workflow Status](https://github.com/FPGA-Mada/freevhdl/actions/workflows/your-workflow.yml)
-
-[Official GitHub Repository](https://github.com/FPGA-Mada/freevhdl)
+[![Workflow Status](https://github.com/FPGA-Mada/freevhdl/actions/workflows/your-workflow.yml/badge.svg)](https://github.com/FPGA-Mada/freevhdl/actions)
 
 
 
