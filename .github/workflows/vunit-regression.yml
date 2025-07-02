@@ -38,6 +38,9 @@ jobs:
     - name: Install VUnit
       run: pip install vunit_hdl
       
+    - name: run vunit for max value 
+      run: python script/Tb_max_value.py
+      
     - name: run vunit for min value 
       run: python script/Tb_min_value.py
       
