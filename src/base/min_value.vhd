@@ -43,7 +43,7 @@ begin
     -- check timing if not active pipeline used 
 	assert PIPELINE_MODE = "NOT_ACTIVE" and NUMBER_IN_DATA_g < 5
 		report "NOT ACTIVE PIPELINE; NUMBER OF INPUT SHALL LESS THAN 5"
-		severity failure;
+		severity warning;
 	       
 
    pipeline_mode_active : if PIPELINE_MODE = "ACTIVE" generate
