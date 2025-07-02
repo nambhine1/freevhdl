@@ -7,7 +7,7 @@ context vunit_lib.vunit_context;
 
 entity min_value_tb is
   generic (
-    runner_cfg : string := ""
+    runner_cfg : string
   );
 end entity;
 
@@ -26,9 +26,6 @@ architecture Behavioral of min_value_tb is
   constant CLK_PERIOD : time := 10 ns;
 
   type int_array_t is array (0 to NUMBER_IN_DATA_g - 1) of integer;
-
-  -- VUnit runner object
-  shared variable runner : runner_t;
 
 begin
 
