@@ -103,7 +103,7 @@ begin
         variable addr_v : integer;
     begin
         if rising_edge(Clk) then
-            addr_v := to_integer(unsigned(Rb_Addr));
+            addr_v := to_integer(unsigned(Rb_Addr(Rb_Addr'high downto 2)));
 
             -- Write operation
             if Rb_Wr = '1' then
