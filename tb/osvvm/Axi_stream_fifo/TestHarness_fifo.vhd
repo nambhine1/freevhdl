@@ -121,7 +121,7 @@ begin
     port map (
 	  
 	clk => Clk,
-	rst => nReset,
+	rst => not nReset,
 	-- stream from master
 	s_valid  =>  RxTValid,
 	s_ready  =>  RxTReady,
