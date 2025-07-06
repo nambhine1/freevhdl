@@ -55,14 +55,14 @@ begin
     -- FIFO status
     fifo_full  <= '1' when (to_integer(count) = FIFO_DEPTH) else '0';
     fifo_empty <= '1' when (to_integer(count) = 0)          else '0';
-
+	
+    s_ready <= not fifo_full;
     -- Control logic
     do_write <= '1' when (s_valid = '1' and s_ready = '1') else '0';
     do_read  <= '1' when (m_ready = '1' and fifo_empty = '0') else '0';
     rw_state <= do_write & do_read;
 
     -- Handshake outputs
-    s_ready <= not fifo_full;
     m_valid <= m_valid_reg;
     m_data  <= m_data_reg;
 
@@ -70,7 +70,7 @@ begin
     fifo_proc : process(clk)
     begin
         if rising_edge(clk) then
-            if rst = '0' then
+            if rst = '1' then
                 count       <= (others => '0');
                 wr_indx     <= (others => '0');
                 rd_indx     <= (others => '0');
