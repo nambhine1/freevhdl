@@ -113,7 +113,7 @@ end process AxiTransmitterProc;
   AxiReceiverProc : process
 	variable ExpData : std_logic_vector(DATA_WIDTH-1 downto 0);
 	variable RcvData : std_logic_vector(DATA_WIDTH-1 downto 0);
-	variable data_r : std_logic_vector (23 downto 0)
+	variable data_r : std_logic_vector (23 downto 0);
 	begin
 	WaitForClock(StreamRxRec, 2);
 	
