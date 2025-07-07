@@ -124,11 +124,11 @@ end process AxiTransmitterProc;
 		Get(StreamRxRec, RcvData);
 		data_r :=RcvData(23 downto 0);
 		if (J = 0) then
-			AffirmIfEqual(RcvData, x"020100", "Data received and matched");
+			AffirmIfEqual(RcvData, x"00020100", "Data received and matched");
 	    elsif (J = 1) then 
-			AffirmIfEqual(RcvData, x"050403", "Data received and matched");
+			AffirmIfEqual(RcvData, x"00050403", "Data received and matched");
 		else 
-			AffirmIfEqual(RcvData, x"080706", "Data received and matched");
+			AffirmIfEqual(RcvData, x"00080706", "Data received and matched");
 		end if;
 	end loop;
 	
