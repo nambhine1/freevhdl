@@ -97,8 +97,9 @@ begin
 	
 		for J in 0 to 17 loop  -- 1000 words
 			  -- match DATA_WIDTH
-			Push(SB, J);
-			Send(StreamTxRec, J);
+			Push(SB, std_logic_vector(to_unsigned(J, DATA_WIDTH_TRANS)));
+                        Send(StreamTxRec, std_logic_vector(to_unsigned(J, DATA_WIDTH_TRANS)));
+
 		end loop;
 	
 		WaitForClock(StreamTxRec, 2);
