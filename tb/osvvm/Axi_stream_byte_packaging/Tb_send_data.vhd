@@ -123,7 +123,7 @@ end process AxiTransmitterProc;
 	for J in 0 to 2 loop
 		Get(StreamRxRec, RcvData);
 		data_r :=RcvData(23 downto 0);
-		log("Data Received: " & to_hstring(data_r), Level => DEBUG);
+		log("Data Received: " & to_hstring(data_r));
 	end loop;
 	
 	WaitForClock(StreamRxRec, 2);
