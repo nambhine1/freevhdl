@@ -51,6 +51,9 @@ begin
                 first_data    := true;
 
             else
+                if m_valid_reg = '1' and m_ready = '1' then
+                    m_valid_reg  <= '0';
+                end if;
                 if s_valid = '1' and s_ready = '1' then
                     if first_data then
                         m_data_reg <= s_data;
@@ -66,9 +69,6 @@ begin
                     end if;
                     m_valid_reg   <= '1';
                     previous_data <= s_data;
-
-                elsif m_ready = '1' then
-                    m_valid_reg <= '0';
                 end if;
             end if;
         end if;
