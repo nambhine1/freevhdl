@@ -70,7 +70,7 @@ begin
     ClearAlerts;
     WaitForBarrier(TestDone, 10 ms);
     AlertIf(now >= 10 ms, "Test finished due to timeout");
-    --AlertIf(GetAffirmCount <15 , "Test is not Self-Checking");
+    AlertIf(GetAffirmCount < 1, "Test is not Self-Checking");
 
     wait for 1 us;
     EndOfTestReports(ReportAll => TRUE);
@@ -123,7 +123,13 @@ end process AxiTransmitterProc;
 	for J in 0 to 2 loop
 		Get(StreamRxRec, RcvData);
 		data_r :=RcvData(23 downto 0);
-		log("Data Received: " & to_hstring(data_r));
+		if (J = 0) then
+			AffirmIfEqual(RcvData, x"020100", "Data received and matched");
+	    elsif (J = 1) then 
+			AffirmIfEqual(RcvData, x"050403", "Data received and matched");
+		else 
+			AffirmIfEqual(RcvData, x"080706", "Data received and matched");
+		end if;
 	end loop;
 	
 	WaitForClock(StreamRxRec, 2);
