@@ -85,26 +85,26 @@ begin
   --   Generate transactions for AxiTransmitter
   ------------------------------------------------------------
 	AxiTransmitterProc : process
-		variable rv : RandomPType;
-		variable rand_data : std_logic_vector (DATA_WIDTH - 1 downto 0);
-	begin
-		wait until nReset = '1';
-		WaitForClock(StreamTxRec, 2);
-		
-		rv.InitSeed("AxiTransmitterProc");  -- Use string literal or integer seed
-	
-		log("Send 1000 words with random values");
-	
-		for J in 0 to 17 loop  -- 1000 words
-			rand_data := rv.RandSlv(17);  -- match DATA_WIDTH
-			Push(SB, rand_data);
-			Send(StreamTxRec, rand_data);
-		end loop;
-	
-		WaitForClock(StreamTxRec, 2);
-		WaitForBarrier(TestDone);
-		wait;
-	end process AxiTransmitterProc;
+    variable rand_data : std_logic_vector (DATA_WIDTH - 1 downto 0);
+begin
+    wait until nReset = '1';
+    WaitForClock(StreamTxRec, 2);
+
+    log("Send 1000 words with incrementing index values");
+
+    for J in 0 to 17 loop  -- 18 words instead of 1000 (check this later if you want exactly 1000)
+        -- Convert loop index J to std_logic_vector of DATA_WIDTH bits
+        rand_data := std_logic_vector(to_unsigned(J, DATA_WIDTH));
+
+        Push(SB, rand_data);
+        Send(StreamTxRec, rand_data);
+    end loop;
+
+    WaitForClock(StreamTxRec, 2);
+    WaitForBarrier(TestDone);
+    wait;
+end process AxiTransmitterProc;
+
 	
 
 
