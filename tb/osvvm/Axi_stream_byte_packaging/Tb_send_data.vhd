@@ -128,9 +128,9 @@ end process AxiTransmitterProc;
 	for J in 0 to data_to_be_send -1 loop
 		Get(StreamRxRec, RcvData);
 		data_r :=RcvData(23 downto 0);
-		exp_data_1 :=  J ;
-                exp_data_2 := j+ 1;
-		exp_data_3 := j+2;
+		exp_data_1 :=  J *3 ;
+                exp_data_2 := exp_data_1 + 1;
+		exp_data_3 := exp_data_2 +2;
 		ExpData := std_logic_vector(to_unsigned(exp_data_3, 8)) &
            	std_logic_vector(to_unsigned(exp_data_2, 8)) &
            	std_logic_vector(to_unsigned(exp_data_1, 8));
