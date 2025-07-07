@@ -130,7 +130,7 @@ end process AxiTransmitterProc;
 		data_r :=RcvData(23 downto 0);
 		exp_data_1 :=  J *3 ;
                 exp_data_2 := exp_data_1 + 1;
-		exp_data_3 := exp_data_2 +2;
+		exp_data_3 := exp_data_2 +1;
 		ExpData := std_logic_vector(to_unsigned(exp_data_3, 8)) &
            	std_logic_vector(to_unsigned(exp_data_2, 8)) &
            	std_logic_vector(to_unsigned(exp_data_1, 8));
