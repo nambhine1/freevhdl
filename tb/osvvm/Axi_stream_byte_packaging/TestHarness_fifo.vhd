@@ -65,7 +65,7 @@ architecture TestHarness of TestHarness_fifo is
   
   constant AXI_DATA_WIDTH_O   : integer := 8 * 3 ;
   constant AXI_DATA_WIDTH   : integer := 8 ;
-  constant AXI_BYTE_WIDTH   : integer := AXI_DATA_WIDTH/8 ; 
+  constant AXI_BYTE_WIDTH   : integer := 4 ; 
   constant AXI_BYTE_WIDTH_O   : integer := AXI_DATA_WIDTH_O/8 ;
   constant TID_MAX_WIDTH    : integer := 8 ;
   constant TDEST_MAX_WIDTH  : integer := 4 ;
