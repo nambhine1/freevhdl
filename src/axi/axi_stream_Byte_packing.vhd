@@ -37,41 +37,49 @@ architecture Behavioral of Byte_packing is
 
 begin
 
-    s_ready <= m_ready or not m_valid_s;
+    -- Ready when we're not currently asserting valid, or the receiver has accepted the current word
+    s_ready <= not m_valid_s or m_ready;
     m_valid <= m_valid_s;
 
+    -- Output data mapping
     map_data_s : for i in 0 to NUMB_OUTPUT_g - 1 generate
-        m_data(((DATA_WIDTH_g * (i + 1)) - 1) downto DATA_WIDTH_g * i) <= m_data_s(i);
+        m_data(((i + 1) * DATA_WIDTH_g - 1) downto (i * DATA_WIDTH_g)) <= m_data_s(i);
     end generate;
 
-    -- Concatenate bytes into one output word
     byte_pack_proc : process(clk)
     begin
         if rising_edge(clk) then
             if rst = '1' then
                 m_valid_s  <= '0';
                 m_data_s   <= (others => (others => '0'));
+                byte_store <= (others => (others => '0'));
                 index_pos  <= 0;
+
             else
-                if (s_valid = '1' and s_ready = '1') then
+                -- If current output has been accepted, clear valid flag
+                if m_valid_s = '1' and m_ready = '1' then
+                    m_valid_s <= '0';
+                end if;
+
+                -- If input is valid and we are ready, accept data
+                if s_valid = '1' and s_ready = '1' then
                     byte_store(index_pos) <= s_data;
 
                     if index_pos = NUMB_OUTPUT_g - 1 then
-                        m_valid_s <= '1';
-                        index_pos <= 0;
-
+                        -- All bytes collected, output word is ready
                         for i in 0 to NUMB_OUTPUT_g - 2 loop
                             m_data_s(i) <= byte_store(i);
                         end loop;
                         m_data_s(NUMB_OUTPUT_g - 1) <= s_data;
+
+                        m_valid_s <= '1';
+                        index_pos <= 0;
                     else
                         index_pos <= index_pos + 1;
                     end if;
-                elsif m_ready = '1' then
-                    m_valid_s <= '0';
                 end if;
             end if;
         end if;
-    end process byte_pack_proc;
+    end process;
 
 end Behavioral;
