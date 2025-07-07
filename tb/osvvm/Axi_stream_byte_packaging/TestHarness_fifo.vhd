@@ -63,10 +63,8 @@ architecture TestHarness of TestHarness_fifo is
   signal Clk       : std_logic := '1' ;
   signal nReset    : std_logic ;
   
-  constant AXI_DATA_WIDTH_O   : integer := 8 * 3 ;
-  constant AXI_DATA_WIDTH   : integer := 8 ;
-  constant AXI_BYTE_WIDTH   : integer := 4 ; 
-  constant AXI_BYTE_WIDTH_O   : integer := AXI_DATA_WIDTH_O/8 ;
+  constant AXI_DATA_WIDTH   : integer := 32 ;
+  constant AXI_BYTE_WIDTH   : integer := AXI_DATA_WIDTH/8 ; 
   constant TID_MAX_WIDTH    : integer := 8 ;
   constant TDEST_MAX_WIDTH  : integer := 4 ;
   constant TUSER_MAX_WIDTH  : integer := 5 ;
@@ -80,30 +78,19 @@ architecture TestHarness of TestHarness_fifo is
   signal TxTID   , RxTID       : std_logic_vector(TID_MAX_WIDTH-1 downto 0) ; 
   signal TxTDest , RxTDest     : std_logic_vector(TDEST_MAX_WIDTH-1 downto 0) ; 
   signal TxTUser , RxTUser     : std_logic_vector(TUSER_MAX_WIDTH-1 downto 0) ; 
-  signal TxTData     : std_logic_vector(AXI_DATA_WIDTH_O-1 downto 0) ; 
-  signal RxTData     : std_logic_vector(AXI_DATA_WIDTH-1 downto 0) ; 
-  signal TxTStrb      : std_logic_vector(AXI_BYTE_WIDTH_O-1 downto 0) ; 
-  signal RxTStrb     : std_logic_vector(AXI_BYTE_WIDTH-1 downto 0) ; 
-  signal TxTKeep     : std_logic_vector(AXI_BYTE_WIDTH_O-1 downto 0) ; 
-  signal RxTKeep     : std_logic_vector(AXI_BYTE_WIDTH-1 downto 0) ; 
+  signal TxTData , RxTData     : std_logic_vector(AXI_DATA_WIDTH-1 downto 0) ; 
+  signal TxTStrb , RxTStrb     : std_logic_vector(AXI_BYTE_WIDTH-1 downto 0) ; 
+  signal TxTKeep , RxTKeep     : std_logic_vector(AXI_BYTE_WIDTH-1 downto 0) ; 
   signal TxTLast , RxTLast     : std_logic ; 
   
   constant AXI_PARAM_WIDTH : integer := TID_MAX_WIDTH + TDEST_MAX_WIDTH + TUSER_MAX_WIDTH + 1 ;
 
-  signal StreamTxRec : StreamRecType(
+  signal StreamTxRec, StreamRxRec : StreamRecType(
       DataToModel   (AXI_DATA_WIDTH-1  downto 0),
       DataFromModel (AXI_DATA_WIDTH-1  downto 0),
       ParamToModel  (AXI_PARAM_WIDTH-1 downto 0),
       ParamFromModel(AXI_PARAM_WIDTH-1 downto 0)
     ) ;  
-	
-   signal StreamRxRec : StreamRecType(
-      DataToModel   (AXI_DATA_WIDTH_O-1  downto 0),
-      DataFromModel (AXI_DATA_WIDTH_O-1  downto 0),
-      ParamToModel  (AXI_PARAM_WIDTH-1 downto 0),
-      ParamFromModel(AXI_PARAM_WIDTH-1 downto 0)
-    ) ;  
-  
   
 
   component TestCtrl is
@@ -129,24 +116,25 @@ begin
   DUT : entity work.Byte_packing 
 	generic map (
 			NUMB_OUTPUT_g => 3,
-			DATA_WIDTH_g => AXI_DATA_WIDTH
+			DATA_WIDTH_g => 8
 	)
     port map (
 	  
 	clk => Clk,
-	rst => not  nReset,
+	rst => not nReset,
 	-- stream from master
 	s_valid  =>  RxTValid,
 	s_ready  =>  RxTReady,
-	s_data   =>  RxTData,
+	s_data   =>  RxTData(7 downto 0),
 
 	-- stream to slave   
 	m_valid   =>  TxTValid,
 	m_ready   =>  TxTReady,
-	m_data    =>  TxTData
+	m_data    =>  TxTData(23 downto 0)
 
     ) ;
-
+	
+	
   -- create Clock 
   Osvvm.ClockResetPkg.CreateClock ( 
     Clk        => Clk, 

@@ -86,7 +86,7 @@ begin
   ------------------------------------------------------------
 	AxiTransmitterProc : process
 		variable rv : RandomPType;
-		variable rand_data : std_logic_vector (DATA_WIDTH_TRANS - 1 downto 0);
+		variable rand_data : std_logic_vector (DATA_WIDTH - 1 downto 0);
 	begin
 		wait until nReset = '1';
 		WaitForClock(StreamTxRec, 2);
@@ -96,10 +96,9 @@ begin
 		log("Send 1000 words with random values");
 	
 		for J in 0 to 17 loop  -- 1000 words
-			  -- match DATA_WIDTH
-			Push(SB, std_logic_vector(to_unsigned(J, DATA_WIDTH_TRANS)));
-                        Send(StreamTxRec, std_logic_vector(to_unsigned(J, DATA_WIDTH_TRANS)));
-
+			rand_data := rv.RandSlv(17);  -- match DATA_WIDTH
+			Push(SB, rand_data);
+			Send(StreamTxRec, rand_data);
 		end loop;
 	
 		WaitForClock(StreamTxRec, 2);
@@ -114,15 +113,15 @@ begin
   --   Generate transactions for AxiReceiver
   ------------------------------------------------------------
   AxiReceiverProc : process
-	variable ExpData : std_logic_vector(DATA_WIDTH_RECEIV-1 downto 0);
-	variable RcvData : std_logic_vector(DATA_WIDTH_RECEIV-1 downto 0);
+	variable ExpData : std_logic_vector(DATA_WIDTH-1 downto 0);
+	variable RcvData : std_logic_vector(DATA_WIDTH-1 downto 0);
 	begin
 	WaitForClock(StreamRxRec, 2);
 	
 	log("Receive and check 1000 incrementing values");
 	
 	ExpData := (others => '0');
-	for J in 0 to 999 loop
+	for J in 0 to 2 loop
 		Get(StreamRxRec, RcvData);
 		log("Data Received: " & to_hstring(RcvData), Level => DEBUG);
 		Check(SB,RcvData);

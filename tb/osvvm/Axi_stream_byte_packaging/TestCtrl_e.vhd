@@ -70,9 +70,8 @@ entity TestCtrl is
   ) ;
 
   -- Derive AXI interface properties from the StreamTxRec
-  constant DATA_WIDTH_TRANS : integer := 8 ; 
-  constant DATA_WIDTH_RECEIV : integer := 8 *3;
-  constant DATA_BYTES : integer := 4 ; 
+  constant DATA_WIDTH : integer := StreamTxRec.DataToModel'length ; 
+  constant DATA_BYTES : integer := DATA_WIDTH/8 ; 
   -- Simplifying access to Burst FIFOs using aliases
   alias TxBurstFifo : ScoreboardIdType is StreamTxRec.BurstFifo ; 
   alias RxBurstFifo : ScoreboardIdType is StreamRxRec.BurstFifo ;
