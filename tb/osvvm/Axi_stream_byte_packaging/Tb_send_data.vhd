@@ -45,6 +45,8 @@ architecture AxiSendGet2 of TestCtrl is
   use      osvvm.ScoreboardPkg_slv.all;
   signal   TestDone : integer_barrier := 1 ;
   signal   SB : ScoreboardIDType;
+  constant number_out : integer := 3;
+  constant data_to_be_send : integer := 15;
 
    
 begin
@@ -92,7 +94,7 @@ begin
 
     log("Send 1000 words with incrementing index values");
 
-    for J in 0 to 8 loop  -- 18 words instead of 1000 (check this later if you want exactly 1000)
+    for J in 0 to (number_out * data_to_be_send) -1 loop  -- 18 words instead of 1000 (check this later if you want exactly 1000)
         -- Convert loop index J to std_logic_vector of DATA_WIDTH bits
         rand_data := std_logic_vector(to_unsigned(J, DATA_WIDTH));
         Send(StreamTxRec, rand_data);
@@ -111,25 +113,28 @@ end process AxiTransmitterProc;
   --   Generate transactions for AxiReceiver
   ------------------------------------------------------------
   AxiReceiverProc : process
-	variable ExpData : std_logic_vector(DATA_WIDTH-1 downto 0);
+	variable ExpData : std_logic_vector(23 downto 0);
 	variable RcvData : std_logic_vector(DATA_WIDTH-1 downto 0);
 	variable data_r : std_logic_vector (23 downto 0);
+        variable exp_data_1: integer ;
+        variable exp_data_2: integer ;
+        variable exp_data_3 : integer;
 	begin
 	WaitForClock(StreamRxRec, 2);
 	
 	log("Receive and check 1000 incrementing values");
 	
 	ExpData := (others => '0');
-	for J in 0 to 2 loop
+	for J in 0 to data_to_be_send -1 loop
 		Get(StreamRxRec, RcvData);
 		data_r :=RcvData(23 downto 0);
-		if (J = 0) then
-			AffirmIfEqual(data_r, x"020100", "Data received and matched");
-	    elsif (J = 1) then 
-			AffirmIfEqual(data_r, x"050403", "Data received and matched");
-		else 
-			AffirmIfEqual(data_r, x"080706", "Data received and matched");
-		end if;
+		exp_data_1 :=  J ;
+                exp_data_2 := j+ 1;
+		exp_data_3 := j+2;
+		ExpData := std_logic_vector(to_unsigned(exp_data_3, 8)) &
+           	std_logic_vector(to_unsigned(exp_data_2, 8)) &
+           	std_logic_vector(to_unsigned(exp_data_1, 8));
+           AffirmIfEqual(data_r,ExpData, "Data received and matched");
 	end loop;
 	
 	WaitForClock(StreamRxRec, 2);
