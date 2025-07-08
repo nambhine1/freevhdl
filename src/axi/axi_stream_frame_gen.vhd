@@ -65,8 +65,8 @@ begin
 
             else
                 -- Clear valid if current output accepted by downstream
-                if m_valid_reg = '1' and m_ready = '1' then
-                    m_valid_reg <= '0';
+                if valid_reg = '1' and m_ready = '1' then
+                    valid_reg <= '0';
                 end if;
                     
                 if (s_valid = '1' and s_ready = '1') then
