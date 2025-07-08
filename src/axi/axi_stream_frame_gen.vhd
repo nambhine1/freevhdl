@@ -64,6 +64,11 @@ begin
                 counter_height <= 0;
 
             else
+                -- Clear valid if current output accepted by downstream
+                if m_valid_reg = '1' and m_ready = '1' then
+                    m_valid_reg <= '0';
+                end if;
+                    
                 if (s_valid = '1' and s_ready = '1') then
                     -- Load new data
                     data_reg <= s_data;
@@ -93,10 +98,6 @@ begin
 
                     user_reg  <= temp_user;
                     valid_reg <= '1';
-
-                elsif (m_ready = '1') then
-                    -- Data was accepted
-                    valid_reg <= '0';
                 end if;
             end if;
         end if;
