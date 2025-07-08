@@ -38,7 +38,7 @@ begin
      process_image_inv : process (clk)
        begin
             if rising_edge (clk) then
-                if rst = '0' then
+                if rst = '1' then
                     m_valid_reg <= '0';
                     m_data_reg <= (others => '0');
                 else
