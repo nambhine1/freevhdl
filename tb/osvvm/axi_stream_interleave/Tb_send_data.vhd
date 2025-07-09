@@ -169,9 +169,6 @@ begin
 	
 		-- Convert integer to std_logic_vector for comparison
 		ExpData := std_logic_vector(to_unsigned(expint, DATA_WIDTH));
-		
-		-- Log received data
-		log("Data Received: " & to_hstring(RcvData), => DEBUG);
 	
 		-- Compare received data with expected data using AffirmIfEqual
 		AffirmIfEqual(RcvData, ExpData,
