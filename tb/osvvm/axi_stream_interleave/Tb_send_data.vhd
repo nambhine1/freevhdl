@@ -93,7 +93,7 @@ begin
 		log("Send 1000 words with random values");
 	
 		for J in 1 to 10 loop  -- 1000 words
-			rand_data := std_logic_vector(to_unsigned(i, DATA_WIDTH));
+			rand_data := std_logic_vector(to_unsigned(J, DATA_WIDTH));
 			Send(StreamTxRec_y, rand_data);
 		end loop;
 	
@@ -116,7 +116,7 @@ begin
 		log("Send 1000 words with random values");
 	
 		for J in 11 to 20 loop  -- 1000 words
-			rand_data := std_logic_vector(to_unsigned(i, DATA_WIDTH));
+			rand_data := std_logic_vector(to_unsigned(J, DATA_WIDTH));
 			Send(StreamTxRec_u, rand_data);
 		end loop;
 	
@@ -134,7 +134,7 @@ begin
 		log("Send 1000 words with random values");
 	
 		for J in 21 to 30 loop  -- 1000 words
-			rand_data := std_logic_vector(to_unsigned(i, DATA_WIDTH));
+			rand_data := std_logic_vector(to_unsigned(J, DATA_WIDTH));
 			Send(StreamTxRec_v, rand_data);
 		end loop;
 	
