@@ -160,7 +160,7 @@ begin
 	
 	ExpData := (others => '0');
 	
-	for J in 1 to 30 loop
+	for J in 1 to 10 loop
 		for i in 0 to 2 loop
 		Get(StreamRxRec, RcvData);
 	
