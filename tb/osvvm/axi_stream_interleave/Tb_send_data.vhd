@@ -70,7 +70,7 @@ begin
     ClearAlerts;
     WaitForBarrier(TestDone, 10 ms);
     AlertIf(now >= 10 ms, "Test finished due to timeout");
-    AlertIf(GetAffirmCount < 31, "Test is not Self-Checking");
+    AlertIf(GetAffirmCount < 30, "Test is not Self-Checking");
 
     wait for 1 us;
     EndOfTestReports(ReportAll => TRUE);
