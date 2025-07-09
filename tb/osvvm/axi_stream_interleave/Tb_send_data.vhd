@@ -70,7 +70,7 @@ begin
     ClearAlerts;
     WaitForBarrier(TestDone, 10 ms);
     AlertIf(now >= 10 ms, "Test finished due to timeout");
-    AlertIf(GetAffirmCount < 1, "Test is not Self-Checking");
+    AlertIf(GetAffirmCount < 31, "Test is not Self-Checking");
 
     wait for 1 us;
     EndOfTestReports(ReportAll => TRUE);
@@ -145,28 +145,47 @@ begin
 	
 
 
-  ------------------------------------------------------------
-  -- AxiReceiverProc
-  --   Generate transactions for AxiReceiver
-  ------------------------------------------------------------
-  AxiReceiverProc : process
+	------------------------------------------------------------
+	-- AxiReceiverProc
+	--   Generate transactions for AxiReceiver
+	------------------------------------------------------------
+	AxiReceiverProc : process
 	variable ExpData : std_logic_vector(DATA_WIDTH-1 downto 0);
 	variable RcvData : std_logic_vector(DATA_WIDTH-1 downto 0);
+	variable expint  : integer := 0;
 	begin
 	WaitForClock(StreamRxRec, 2);
 	
 	log("Receive and check 1000 incrementing values");
 	
 	ExpData := (others => '0');
+	
 	for J in 1 to 30 loop
+		for i in 0 to 2 loop
 		Get(StreamRxRec, RcvData);
-		log("Data Received: " & to_hstring(RcvData));
+	
+		-- Calculate expected integer value
+		expint := J + 10 * i;
+	
+		-- Convert integer to std_logic_vector for comparison
+		ExpData := std_logic_vector(to_unsigned(expint, DATA_WIDTH));
+		
+		-- Log received data
+		log("Data Received: " & to_hstring(RcvData), => DEBUG);
+	
+		-- Compare received data with expected data using AffirmIfEqual
+		AffirmIfEqual(RcvData, ExpData,
+			"Mismatch: received " & to_hstring(RcvData) & 
+			" expected " & to_hstring(ExpData),
+			TRUE);
+		end loop;
 	end loop;
 	
 	WaitForClock(StreamRxRec, 2);
 	WaitForBarrier(TestDone);
 	wait;
-  end process AxiReceiverProc;
+	end process AxiReceiverProc;
+
 
 
 end AxiSendGet2 ;
