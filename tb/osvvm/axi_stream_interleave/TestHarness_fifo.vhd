@@ -282,7 +282,7 @@ begin
       -- AXI Stream Interface
       -- From TB Transmitter to DUT Receiver
       TValid    => RxTValid_v,
-      TReady    => RxTReadv_v,
+      TReady    => RxTReady_v,
       TID       => RxTID_v   ,
       TDest     => RxTDest_v ,
       TUser     => RxTUser_v ,
