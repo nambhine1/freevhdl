@@ -37,6 +37,16 @@ jobs:
       - name: Run OSVVM byte packing
         run: |
           set -e
+          tclsh script/regression_axi_stream_interleave.tcl 2>&1 | tee regression_axi_stream_interleave.log
+          if grep -q -e "FAILED" -e "FAILURE" -e "ERROR" regression_axi_stream_interleave.log; then
+            echo "❌ Test failed: regression_axi_stream_interleave.tcl"
+            exit 1
+          fi
+
+      # Regression tests with precise failure handling
+      - name: Run OSVVM byte packing
+        run: |
+          set -e
           tclsh script/regression_axi_byte_packing.tcl 2>&1 | tee regression_axi_byte_packing.log
           if grep -q -e "FAILED" -e "FAILURE" -e "ERROR" regression_axi_byte_packing.log; then
             echo "❌ Test failed: regression_axi_byte_packing.tcl"
