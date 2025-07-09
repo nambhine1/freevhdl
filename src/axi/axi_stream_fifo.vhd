@@ -79,8 +79,11 @@ begin
                 fifo_mem    <= (others => (others => '0'));
 
             else
-                -- Default: clear output valid
-                m_valid_reg <= '0';
+               -- Default: clear output valid
+               -- Clear valid if current output accepted by downstream
+                if m_valid_reg = '1' and m_ready = '1' then
+                    m_valid_reg <= '0';
+                end if; 
 
                 -- Write
                 if do_write = '1' then

@@ -38,10 +38,13 @@ begin
      process_image_inv : process (clk)
        begin
             if rising_edge (clk) then
-                if rst = '0' then
+                if rst = '1' then
                     m_valid_reg <= '0';
                     m_data_reg <= (others => '0');
                 else
+                    if (m_ready = '1' and m_valid_reg = '1') then
+                        m_valid_reg <= '0';
+                    end if;
                     if (s_valid = '1' and s_ready = '1') then
                         for i in 0 to Number_of_data -1 loop
                             m_data_reg((((i+1)*BIT_PER_DATA) - 1) downto i*BIT_PER_DATA) <=
@@ -50,8 +53,6 @@ begin
                              BIT_PER_DATA));
                         end loop;
                         m_valid_reg <= '1';
-                    elsif (m_ready = '1') then  
-                         m_valid_reg <= '0';
                     end if; 
                 end if;
             end if;
