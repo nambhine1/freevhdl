@@ -45,6 +45,9 @@ begin
                    m_valid_reg <= '0';
                    m_data_reg  <= (others => '0');
                else
+                   if (m_valid_reg = '1' and m_ready = '1') then
+                     m_valid_reg <= '0';
+                   end if;
                    if passthrough_sel = '1' then
                        -- Inversion mode
                        if (s_valid = '1' and s_ready = '1') then
@@ -56,16 +59,12 @@ begin
                                        BIT_PER_DATA));
                            end loop;
                            m_valid_reg <= '1';
-                       elsif m_ready = '1' then
-                           m_valid_reg <= '0';
                        end if;
                    else
                        -- Passthrough mode
                        if (s_valid = '1' and s_ready = '1') then
                            m_data_reg <= s_data;
                            m_valid_reg <= '1';
-                       elsif m_ready = '1' then
-                           m_valid_reg <= '0';
                        end if;
                    end if;
                end if;
