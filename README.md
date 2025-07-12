@@ -53,7 +53,7 @@ Together, these tools help ensure robust, scalable, and repeatable simulation of
 
 ---
 
-## 🛠️ Getting Started
+## Getting Started
 
 ### Requirements
 
